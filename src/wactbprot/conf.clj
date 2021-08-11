@@ -8,12 +8,15 @@
   ([] (get-config (io/resource "config.edn")))
   ([f] (-> f slurp edn/read-string)))
 
-(defn base-url [{prot :prot srv :srv port :port}]
-  (let [usr  (System/getenv "CAL_USR")
-        pwd  (System/getenv "CAL_PWD")]
-    (str prot "://" (when (and usr pwd) (str usr ":" pwd "@")) srv ":" port)))
+(defn cred-usr []
+  {:cred-usr-name (System/getenv "CAL_USR")
+   :cred-usr-pwd  (System/getenv "CAL_PWD")})
 
-(defn conn [{db :db :as c}] (str (base-url c) "/" db))
+(defn cred-admin []
+  {:cred-admin-name (System/getenv "ADMIN_USR")
+   :cred-admin-pwd  (System/getenv "ADMIN_PWD")})
+
+(defn base-url [{prot :prot srv :srv port :port}] (str prot "://"  srv ":" port))
 
 (defn log-context [{app-name :app-name :as c}]
   {:facility (get-in c [:mulog :context :facility])
@@ -21,10 +24,11 @@
 
 (def conf 
   (let [c (get-config)]
-    (assoc c
-           :global-log-context (log-context c)
-           :base-url (base-url c)
-           :conn (conn c))))
+    (merge (assoc c
+                  :global-log-context (log-context c)
+                  :base-url (base-url c))
+           (cred-usr)
+           (cred-admin))))
 
 (comment
   (require :reload 'wactbprot.replhub.conf))

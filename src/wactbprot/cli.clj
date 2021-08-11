@@ -8,6 +8,8 @@
 
 (defn get-repl-doc [{id :repl-doc :as conf}] (db/get-doc conf id))
 
+(defn gen-db-usr [conf conn] (db/gen-usr conf conn))  
+  
 (defn -main
   "Say Hello!"
   [& args]
