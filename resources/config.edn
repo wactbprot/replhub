@@ -1,0 +1,18 @@
+{:app-name "replhub"
+ ;; gui server
+ :api {:port 8011}
+ ;; db access
+ :srv "127.0.0.1"
+ :port 5984
+ :db "vl_db"
+ :prot "http"
+ :repl-doc "000_SERVERS"
+ ;; logging
+ :mulog {:context {:facility "vs-38"}
+         :type :multi
+         :publishers[{:type :elasticsearch
+                      :url "http://a75438:9200/"
+                      :els-version  :v7.x
+                      :publish-delay 1000
+                      :data-stream  "repl-log-stream"
+                      :name-mangling false}]}}
