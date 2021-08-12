@@ -1,14 +1,30 @@
 (ns wactbprot.replhub.db
-  (:require [org.httpkit.client :as http]))
+  (:require [org.httpkit.client :as http]
+            [com.brunobonacci.mulog :as µ]))
 
-(defn opts [{usr :cred-usr-name pwd :cred-usr-pwd}] { :basic-auth [usr pwd]})
+(defn url [{prot :prot srv :srv port :port}] (str prot "://"  srv ":" port))
 
-(defn get-doc [{url :base-url :as conf} id] (http/get (str url "/" id) (opts conf)))
+(defn db-url [{db :db :as conn}] (str (url conn) "/" db))
 
-(defn gen-usr [conf {usr :cred-usr-name pwd :cred-usr-pwd}]
-  (let [ma {:name  usr
+(defn doc-url [{id :db :as conn}]  (str (db-url conn) "/" id))
+
+(defn opts
+  ([conn] (opts conn :usr))
+  ([conn role]
+   {:basic-auth
+    (condp = role
+      :usr   [(:cred-usr-name conn) (:cred-usr-pwd conn)]
+      :admin [(:cred-admin-name conn) (:cred-admin-pwd conn)])}))
+
+   
+(defn get-doc [conn] (http/get (doc-url conn) (opts conn)))
+
+(defn gen-usr [{usr :cred-usr-name pwd :cred-usr-pwd}]
+  (let [a {:name  usr
             :password pwd
             :roles []
             :type "user"}
-        mb {:members {:names [usr]
+        b {:members {:names [usr]
                       :roles []}}]))
+
+(defn gen-db [conn] (http/put (db-url conn) (opts conn :admin)))

@@ -8,8 +8,8 @@
  :prot "http"
  :repl-doc "000_SERVERS"
  ;; logging
- :mulog {:context {:facility "vs-38"}
-         :type :multi
+ :log-context {:facility "vs-38"}
+ :mulog {:type :multi
          :publishers[{:type :elasticsearch
                       :url "http://a75438:9200/"
                       :els-version  :v7.x

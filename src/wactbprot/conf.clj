@@ -16,8 +16,6 @@
   {:cred-admin-name (System/getenv "ADMIN_USR")
    :cred-admin-pwd  (System/getenv "ADMIN_PWD")})
 
-(defn base-url [{prot :prot srv :srv port :port}] (str prot "://"  srv ":" port))
-
 (defn log-context [{app-name :app-name :as c}]
   {:facility (get-in c [:mulog :context :facility])
    :app-name app-name})
