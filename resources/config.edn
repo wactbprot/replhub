@@ -6,6 +6,7 @@
  :port 5984
  :db "vl_db"
  :prot "http"
+ :timeout 30000
  :repl-doc "000_SERVERS"
  ;; logging
  :log-context {:facility "vs-38"}

@@ -6,7 +6,7 @@
 
 (defn stop
   ([] (stop conf/conf))
-  ([conf]
+  ([c]
    (µ/log ::stop)
    (@logger)
    (reset! logger nil)))
@@ -16,5 +16,4 @@
   ([{mulog :mulog log-context :log-context app-name :app-name}]
    (µ/set-global-context! (assoc log-context
                                  :app-name app-name))
-   (reset! logger (µ/start-publisher! mulog))
-   conf))
+   (reset! logger (µ/start-publisher! mulog))))
