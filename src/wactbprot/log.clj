@@ -1,4 +1,7 @@
 (ns wactbprot.replhub.log
+  ^{:author "Thomas Bock <wactbprot@gmail.com>"
+      :doc "Switch log on and off. Uses [µlog](https://github.com/BrunoBonacci/mulog). 
+            Writes direct to elastic search."}
   (:require [wactbprot.replhub.conf :as conf]
             [com.brunobonacci.mulog :as µ]))
 

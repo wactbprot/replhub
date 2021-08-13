@@ -1,4 +1,6 @@
 (ns wactbprot.replhub.conf
+  ^{:author "Thomas Bock <wactbprot@gmail.com>"
+    :doc "Configuration functions. Merge environment variables."}
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.string :as string]))

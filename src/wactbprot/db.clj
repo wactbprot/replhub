@@ -1,8 +1,13 @@
 (ns wactbprot.replhub.db
+  ^{:author "Thomas Bock <wactbprot@gmail.com>"
+    :doc "Basic database interop. Plain HTTP."}
   (:require [cheshire.core :as che]
             [org.httpkit.client :as http]
             [com.brunobonacci.mulog :as µ]))
 
+;;........................................................................
+;; utils
+;;........................................................................
 (defn url [{prot :prot srv :srv port :port}] (str prot "://"  srv ":" port))
 
 (defn db-url [{db :db :as conn}] (str (url conn) "/" db))
@@ -23,15 +28,17 @@
       :admin [(:cred-admin-name conn) (:cred-admin-pwd conn)])}))
 
 (defn result [{body :body header :headers status :status url :url}]
-  (let [body (try
-               (che/decode body true)
-               (catch Exception e
-                 (µ/log ::result :error (.getMessage e))))]
+  (let [body (try (che/decode body true)
+                  (catch Exception e (µ/log ::result :error (.getMessage e))))]
     (if (< status 400) 
       (µ/log ::result :status  status :ok true :url url)
       (µ/log ::result :status  status :error (:error body) :reason (:reason body) :url url))
     (or body header)))
 
+;;........................................................................
+;; query fuctions
+;;........................................................................
+(defn exists? [conn opt] (contains? (result @(http/head url opt)) :etag))
 
 (defn get-doc [conn]
   (let [url (doc-url conn)]
@@ -46,10 +53,9 @@
 (defn gen-usr [{usr :cred-usr-name pwd :cred-usr-pwd :as conn}]
   (let [url  (usr-url conn)
         opt  (opts conn :admin)
-        body (che/encode {:name usr :password pwd :roles [] :type "user"})
-        head (result @(http/head url opt))]
+        body (che/encode {:name usr :password pwd :roles [] :type "user"})]
     (µ/log ::gen-usr :url url :state :prepair)
-    (if-not (contains? head :etag)
+    (if-not (exists? conn opt)
       (result @(http/put url (assoc opt :body body)))
       {:ok true :warn "already exists"})))
 

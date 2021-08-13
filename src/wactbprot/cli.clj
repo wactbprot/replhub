@@ -1,4 +1,6 @@
 (ns wactbprot.replhub.cli
+  ^{:author "Thomas Bock <wactbprot@gmail.com>"
+    :doc "Command line interface."}
   (:require [wactbprot.replhub.db :as db]
             [wactbprot.replhub.conf :as conf]
             [wactbprot.replhub.log :as log]
@@ -9,7 +11,7 @@
 
 (defn log-stop [c] (log/stop c))
 
-(defn get-repl-doc [{id :repl-doc :as c}] (db/get-doc (assoc c :id id)))
+(defn get-repl-doc [c] (db/get-doc c))
 
 (defn gen-usr [c] (db/gen-usr c))  
 

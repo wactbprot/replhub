@@ -1,6 +1,6 @@
 # replhub
 
-FIXME: my new application.
+Keep CouchDB (v3) replications alive, generate database users, visualize replication status.
 
 ## Installation
 
