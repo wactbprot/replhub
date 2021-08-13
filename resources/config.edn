@@ -7,7 +7,7 @@
  :db "vl_db"
  :prot "http"
  :timeout 30000
- :repl-doc "000_SERVERS"
+ :repl-doc "001_SERVERS"
  ;; logging
  :log-context {:facility "vs-38"}
  :mulog {:type :multi

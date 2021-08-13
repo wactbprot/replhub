@@ -16,7 +16,7 @@
    :cred-admin-name (System/getenv "ADMIN_USR")
    :cred-admin-pwd  (System/getenv "ADMIN_PWD")})
 
-(def conf (merge (get-config) (cred))))
+(def conf (merge (get-config) (cred)))
 
 (comment
   (require :reload 'wactbprot.replhub.conf))
