@@ -4,6 +4,7 @@
   (:require [wactbprot.replhub.db :as db]
             [wactbprot.replhub.conf :as conf]
             [wactbprot.replhub.log :as log]
+            [clojure.pprint :as pp]
             [com.brunobonacci.mulog :as µ]))
 
 ;;........................................................................
@@ -28,6 +29,14 @@
 (defn db-usr [c] (db/gen-usr c) (db/add-usr c))
   
 (defn gen-db [c] (db/gen-db c))  
+
+;;........................................................................
+;; usr
+;;........................................................................
+(defn active-repl [c]
+  (let [v [:source  :target :continuous :user]
+        t (filterv #(= (:type %) "replication") (db/active-tasks c))]
+    (pp/print-table (mapv #(select-keys % v) t))))
 
 (def c conf/conf)
 

@@ -18,6 +18,9 @@
 
 (defn sec-url [conn] (str (db-url conn) "/_security"))
 
+(defn act-url [conn] (str (url conn) "/_active_tasks"))
+
+
 (defn opts
   ([conn] (opts conn :usr))
   ([conn role]
@@ -39,6 +42,8 @@
 ;; query fuctions
 ;;........................................................................
 (defn exists? [conn opt] (contains? (result @(http/head url opt)) :etag))
+
+(defn active-tasks [conn] (result @(http/get (act-url conn) (opts conn :admin))))
 
 (defn get-doc [conn]
   (let [url (doc-url conn)]
