@@ -5,7 +5,9 @@
             [wactbprot.repliclj.conf :as conf]
             [wactbprot.repliclj.log :as log]
             [clojure.pprint :as pp]
-            [com.brunobonacci.mulog :as µ]))
+            [com.brunobonacci.mulog :as µ])
+  (:use   [clojure.repl])
+  (:gen-class))
 
 ;;........................................................................
 ;; log
@@ -37,13 +39,14 @@
 
 (defn repl-table [c]
   (let [v [:source :target :continuous :user]]
-    (pp/print-table (mapv #(select-keys % v) act-repl))))
+    (pp/print-table (mapv #(select-keys % v) (act-repl c)))))
 
 (def c conf/conf)
 
 (comment
   
   (get-doc (assoc c :id (:repl-doc c)))
+  (gen-db (assoc c :db "_users"))
+  (gen-db (assoc c :db "_replicator"))
   (gen-usr (assoc c :db "rh" :cred-usr-name "rh"))
-  (gen-db (assoc c :db "rh"))
   (add-usr (assoc c :db "rh" :cred-usr-name "rh")))

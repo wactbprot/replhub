@@ -8,17 +8,17 @@
 ;;........................................................................
 ;; utils
 ;;........................................................................
-(defn url [{prot :prot srv :srv port :port}] (str prot "://"  srv ":" port))
+(defn base-url [{prot :prot srv :srv port :port}] (str prot "://"  srv ":" port))
 
-(defn db-url [{db :db :as conn}] (str (url conn) "/" db))
+(defn db-url [{db :db :as conn}] (str (base-url conn) "/" db))
 
 (defn doc-url [{id :id :as conn}] (str (db-url conn) "/" id))
 
-(defn usr-url [{usr :cred-usr-name :as conn}] (str (url conn) "/_users/org.couchdb.user:" usr))
+(defn usr-url [{usr :cred-usr-name :as conn}] (str (base-url conn) "/_users/org.couchdb.user:" usr))
 
 (defn sec-url [conn] (str (db-url conn) "/_security"))
 
-(defn act-url [conn] (str (url conn) "/_active_tasks"))
+(defn act-url [conn] (str (base-url conn) "/_active_tasks"))
 
 
 (defn opts
@@ -41,7 +41,7 @@
 ;;........................................................................
 ;; query fuctions
 ;;........................................................................
-(defn exists? [conn opt] (contains? (result @(http/head url opt)) :etag))
+(defn exists? [url opt] (contains? (result @(http/head url opt)) :etag))
 
 (defn active-tasks [conn] (result @(http/get (act-url conn) (opts conn :admin))))
 
@@ -60,7 +60,7 @@
         opt  (opts conn :admin)
         body (che/encode {:name usr :password pwd :roles [] :type "user"})]
     (µ/log ::gen-usr :url url :state :prepair)
-    (if-not (exists? conn opt)
+    (if-not (exists? url opt)
       (result @(http/put url (assoc opt :body body)))
       {:ok true :warn "already exists"})))
 

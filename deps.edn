@@ -1,7 +1,8 @@
-{:paths ["src" "resources"]
- :deps {org.clojure/clojure {:mvn/version "1.10.3"}}
+{:deps {org.clojure/clojure {:mvn/version "1.10.3"}
+        org.clojure/tools.deps.alpha {:mvn/version "0.12.1019"}}
  :aliases
- {:dev {:extra-deps {org.clojure/clojure {:mvn/version "1.10.3"}
+ {:dev {:extra-paths ["src/wactbprot" "resources"]
+        :extra-deps {org.clojure/clojure {:mvn/version "1.10.3"}
                      cheshire/cheshire {:mvn/version "5.10.1"}
                      compojure/compojure {:mvn/version "1.6.2"}
                      http-kit/http-kit {:mvn/version "2.5.3"}
@@ -14,8 +15,6 @@
                      com.brunobonacci/mulog {:mvn/version "0.8.0"}
                      com.brunobonacci/mulog-elasticsearch {:mvn/version "0.8.0"}
                      com.fzakaria/slf4j-timbre {:mvn/version "0.3.21"}}}
-  
-  :run-m {:main-opts ["-m" "wactbprot.repliclj"]}
 
   :test {:extra-paths ["test"]
          :extra-deps {org.clojure/test.check {:mvn/version "1.1.0"}
