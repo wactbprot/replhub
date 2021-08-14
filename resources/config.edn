@@ -1,4 +1,4 @@
-{:app-name "replhub"
+{:app-name "repliclj"
  ;; gui server
  :api {:port 8011}
  ;; db access

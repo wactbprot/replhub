@@ -2,11 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.clojars.wactbprot</groupId>
-  <artifactId>replhub</artifactId>
+  <artifactId>repliclj</artifactId>
   <version>0.1.0-SNAPSHOT</version>
-  <name>wactbprot/replhub</name>
+  <name>wactbprot/repliclj</name>
   <description>FIXME: my new application.</description>
-  <url>https://github.com/wactbprot/replhub</url>
+  <url>https://github.com/wactbprot/repliclj</url>
   <licenses>
     <license>
       <name>Eclipse Public License</name>
@@ -19,9 +19,9 @@
     </developer>
   </developers>
   <scm>
-    <url>https://github.com/wactbprot/replhub</url>
-    <connection>scm:git:git://github.com/wactbprot/replhub.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/wactbprot/replhub.git</developerConnection>
+    <url>https://github.com/wactbprot/repliclj</url>
+    <connection>scm:git:git://github.com/wactbprot/repliclj.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/wactbprot/repliclj.git</developerConnection>
     <tag>v0.1.0-SNAPSHOT</tag>
   </scm>
   <dependencies>

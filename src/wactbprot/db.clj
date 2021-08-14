@@ -1,4 +1,4 @@
-(ns wactbprot.replhub.db
+(ns wactbprot.repliclj.db
   ^{:author "Thomas Bock <wactbprot@gmail.com>"
     :doc "Basic database interop. Plain HTTP."}
   (:require [cheshire.core :as che]

@@ -1,9 +1,9 @@
-(ns wactbprot.replhub.cli
+(ns wactbprot.repliclj.cli
   ^{:author "Thomas Bock <wactbprot@gmail.com>"
     :doc "Command line interface."}
-  (:require [wactbprot.replhub.db :as db]
-            [wactbprot.replhub.conf :as conf]
-            [wactbprot.replhub.log :as log]
+  (:require [wactbprot.repliclj.db :as db]
+            [wactbprot.repliclj.conf :as conf]
+            [wactbprot.repliclj.log :as log]
             [clojure.pprint :as pp]
             [com.brunobonacci.mulog :as µ]))
 
@@ -31,12 +31,13 @@
 (defn gen-db [c] (db/gen-db c))  
 
 ;;........................................................................
-;; usr
+;; replication
 ;;........................................................................
-(defn active-repl [c]
-  (let [v [:source  :target :continuous :user]
-        t (filterv #(= (:type %) "replication") (db/active-tasks c))]
-    (pp/print-table (mapv #(select-keys % v) t))))
+(defn act-repl [c] (filterv #(= (:type %) "replication") (db/active-tasks c)))
+
+(defn repl-table [c]
+  (let [v [:source :target :continuous :user]]
+    (pp/print-table (mapv #(select-keys % v) act-repl))))
 
 (def c conf/conf)
 

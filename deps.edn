@@ -15,7 +15,7 @@
                      com.brunobonacci/mulog-elasticsearch {:mvn/version "0.8.0"}
                      com.fzakaria/slf4j-timbre {:mvn/version "0.3.21"}}}
   
-  :run-m {:main-opts ["-m" "wactbprot.replhub"]}
+  :run-m {:main-opts ["-m" "wactbprot.repliclj"]}
 
   :test {:extra-paths ["test"]
          :extra-deps {org.clojure/test.check {:mvn/version "1.1.0"}
@@ -27,6 +27,6 @@
   :uberjar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.1.278"}}
             :exec-fn hf.depstar/uberjar
             :exec-args {:aot true
-                        :jar "replhub.jar"
-                        :main-class "wactbprot.replhub"
+                        :jar "repliclj.jar"
+                        :main-class "wactbprot.repliclj"
                         :sync-pom true}}}}
