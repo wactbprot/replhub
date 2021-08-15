@@ -1,0 +1,76 @@
+digraph G {
+splines=true;
+	
+subgraph cluster_0 {
+	node [shape=circle];  s_00; s_01;
+	node [shape=box, fixedsize=true, width=1.6]; vl_db_00; vl_db_01;
+	
+	s_00 -> vl_db_00 [dir=none,weight=1];
+	s_01 -> vl_db_01 [dir=none,weight=1];
+
+	vl_db_00 -> vl_db_01;
+	vl_db_01 -> vl_db_00;
+}
+
+node [shape=circle];
+s_10; s_11; s_12; s_13;
+node [shape=box,fixedsize=true,width=1.6];
+vl_db_work_10; vl_db_work_11; vl_db_work_12; vl_db_work_13;
+vl_db_10; vl_db_11; vl_db_12; vl_db_13;
+vl_db_bu_10; vl_db_bu_11; vl_db_bu_12; vl_db_bu_13;  
+
+s_10 -> vl_db_10 [dir=none,weight=1];
+s_11 -> vl_db_11 [dir=none,weight=1];
+s_12 -> vl_db_12 [dir=none,weight=1];
+s_13 -> vl_db_13 [dir=none,weight=1];
+
+
+vl_db_00 -> vl_db_10[len = 2];
+vl_db_01 -> vl_db_10[len = 2];
+vl_db_00 -> vl_db_11[len = 2];
+vl_db_01 -> vl_db_11[len = 2];
+vl_db_00 -> vl_db_12[len = 2];
+vl_db_01 -> vl_db_12[len = 2];
+vl_db_00 -> vl_db_13[len = 2];
+vl_db_01 -> vl_db_13[len = 2];
+
+
+
+
+vl_db_10 -> vl_db_00;
+vl_db_10 -> vl_db_01;
+
+vl_db_11 -> vl_db_00;
+vl_db_11 -> vl_db_01;
+
+vl_db_12 -> vl_db_00;
+vl_db_12 -> vl_db_01;
+
+vl_db_13 -> vl_db_00;
+vl_db_13 -> vl_db_01;
+
+s_10 -> vl_db_work_10 [dir=none,weight=1];
+s_11 -> vl_db_work_11 [dir=none,weight=1];
+s_12 -> vl_db_work_12 [dir=none,weight=1];
+s_13 -> vl_db_work_13 [dir=none,weight=1];
+
+s_10 -> vl_db_bu_10 [dir=none,weight=1];
+s_11 -> vl_db_bu_11 [dir=none,weight=1];
+s_12 -> vl_db_bu_12 [dir=none,weight=1];
+s_13 -> vl_db_bu_13 [dir=none,weight=1];
+
+
+vl_db_10 -> vl_db_work_10;
+vl_db_11 -> vl_db_work_11;
+vl_db_12 -> vl_db_work_12;
+vl_db_13 -> vl_db_work_13;
+
+vl_db_10 -> vl_db_bu_10;
+vl_db_11 -> vl_db_bu_11;
+vl_db_12 -> vl_db_bu_12;
+vl_db_13 -> vl_db_bu_13;
+
+overlap=false
+label="Replication Model"
+fontsize=12;
+}

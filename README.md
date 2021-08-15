@@ -20,4 +20,13 @@ that manages the replication. The following environment variables should be set:
 * `export ADMIN_USR=<admins name>` (defaults to "admin")
 * `export ADMIN_PWD=<admins password>`
 * `export REPLICLJ_USR=< users name>` (defaults to "rcusr")
-* `export REPLICLJ_PWD=< users password>` 
+* `export REPLICLJ_PWD=< users password>`
+
+
+## note
+
+### model graph
+
+```shell
+neato model.dot -T png > model.png
+```
