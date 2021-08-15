@@ -6,11 +6,12 @@ Keep CouchDB (v3) replications alive, generate database users, visualize replica
 
 ## Replication documentation
 
-* [introduction-to-replication](https://docs.couchdb.org/en/stable/replication/intro.html#introduction-to-replication) 
+* [introduction to replication](https://docs.couchdb.org/en/stable/replication/intro.html#introduction-to-replication) 
 * `RepliClj` uses [persistent replication](https://docs.couchdb.org/en/stable/replication/intro.html#transient-and-persistent-replication)
-* [start, stop](https://docs.couchdb.org/en/stable/replication/intro.html#transient-and-persistent-replication)
+* [replication start, stop](https://docs.couchdb.org/en/stable/replication/intro.html#transient-and-persistent-replication)
+* [replication states descriptions](https://docs.couchdb.org/en/main/replication/replicator.html#states-descriptions]
 
-## ENVVARs
+## Environment vars
 
 Some operations need admin rights: generate the `_users` and
 `_replicator` datebase furthermore the generation and adding a user
