@@ -8,7 +8,7 @@
 ;;........................................................................
 ;; utils
 ;;........................................................................
-(defn base-url [{prot :prot srv :srv port :port}] (str prot "://"  srv ":" port))
+(defn base-url [{prot :prot srv :server port :port}] (str prot "://"  srv ":" port))
 
 (defn db-url [{db :db :as conn}] (str (base-url conn) "/" db))
 
@@ -24,6 +24,7 @@
 (defn opts
   ([conn] (opts conn :usr))
   ([conn role]
+   (prn conn)
    {:timeout (:timeout conn)
     :basic-auth
     (condp = role
@@ -34,8 +35,8 @@
   (let [body (try (che/decode body true)
                   (catch Exception e (µ/log ::result :error (.getMessage e))))]
     (if (< status 400) 
-      (µ/log ::result :status  status :ok true :url url)
-      (µ/log ::result :status  status :error (:error body) :reason (:reason body) :url url))
+      (µ/log ::result :status  status :url url)
+      (µ/log ::result :status  status :reason (:reason body) :url url))
     (or body header)))
 
 ;;........................................................................
@@ -47,27 +48,24 @@
 
 (defn get-doc [conn]
   (let [url (doc-url conn)]
-    (µ/log ::get-doc :url url :state :start)
     (result @(http/get url (opts conn)))))
 
 (defn gen-db [conn]
-  (let [url (doc-url conn)]
-    (µ/log ::gen-db :url url :state :start)
-    (result @(http/put (db-url conn) (opts conn :admin)))))
+  (let [url (doc-url conn)
+        opt (opts conn :admin)]
+    (when-not (exists? url opt)
+      (result @(http/put (db-url conn) (opts conn :admin))))))
 
 (defn gen-usr [{usr :cred-usr-name pwd :cred-usr-pwd :as conn}]
   (let [url  (usr-url conn)
         opt  (opts conn :admin)
         body (che/encode {:name usr :password pwd :roles [] :type "user"})]
-    (µ/log ::gen-usr :url url :state :prepair)
-    (if-not (exists? url opt)
-      (result @(http/put url (assoc opt :body body)))
-      {:ok true :warn "already exists"})))
+    (when-not (exists? url opt)
+      (result @(http/put url (assoc opt :body body))))))
 
 (defn add-usr [{usr :cred-usr-name :as conn}]
   (let [url  (sec-url conn)
         opt  (opts conn :admin)
         body (che/encode {:members {:names [usr] :roles []}})]
-    (µ/log ::add-usr :url url :state :start)
     (result @(http/put url (assoc opt :body body)))))
 

@@ -1,13 +1,14 @@
 {:app-name "repliclj"
  ;; gui server
  :api {:port 8011}
+
  ;; db access
- :srv "127.0.0.1"
+ :server "127.0.0.1"
  :port 5984
- :db "vl_db"
  :prot "http"
  :timeout 30000
- :repl-doc "001_SERVERS"
+ :repl-doc "000_REPLICATIONS"
+
  ;; logging
  :log-context {:facility "vs-38"}
  :mulog {:type :multi

@@ -12,12 +12,11 @@
   ([f] (-> f slurp edn/read-string)))
 
 (defn cred []
-  {:cred-usr-name (or (System/getenv "REPLICLJ_USR") "rcusr")
-   :cred-usr-pwd  (System/getenv "REPLICLJ_PWD")
-   :cred-cal-name (or (System/getenv "CAL_USR") "cal")
-   :cred-cal-pwd  (System/getenv "CAL_PWD")
+  {:cred-usr-name (or (System/getenv "CAL_USR") "cal")
+   :cred-usr-pwd  (System/getenv "CAL_PWD")
+
    :cred-admin-name (or (System/getenv "ADMIN_USR") "admin")
-   :cred-admin-pwd  (System/getenv "ADMIN_PWD")})
+   :cred-admin-secret  (System/getenv "ADMIN_SECRET")})
 
 (def conf (merge (get-config) (cred)))
 
