@@ -41,30 +41,39 @@
 ;;........................................................................
 ;; query fuctions
 ;;........................................................................
-(defn exists? [url opt]
-  (let [res @(http/head url opt)]
-    (and (not (contains? res :error)) (< (:status res) 400))))
+(defn online? [url opt] (not (contains? @(http/head url opt) :error)))
+
+(defn exists? [url opt]  (< (get @(http/head url opt) :status 400) 400))
 
 (defn active-tasks [conn] (result @(http/get (act-url conn) (opts conn :admin))))
 
-(defn get-doc [conn] (result @(http/get (doc-url conn) (opts conn))))
+(defn get-doc [conn]
+  (let [url (doc-url conn) 
+        opt (opts conn :admin)]
+    (when (online? url conn)
+      (when (exists? url opt)
+      (result @(http/get url opt))))))
 
 (defn gen-db [conn]
-  (let [url (doc-url conn)
+  (let [url (db-url conn)
         opt (opts conn :admin)]
-    (when-not (exists? url opt)
-      (result @(http/put (db-url conn) (opts conn :admin))))))
+    (when (online? url conn)
+      (when-not (exists? url opt)
+        (result @(http/put url opt))))))
 
 (defn gen-usr [{usr :cred-usr-name pwd :cred-usr-pwd :as conn}]
   (let [url  (usr-url conn)
         opt  (opts conn :admin)
         body (che/encode {:name usr :password pwd :roles [] :type "user"})]
-    (when-not (exists? url opt)
-      (result @(http/put url (assoc opt :body body))))))
+    (when (online? url conn)
+      (when-not (exists? url opt)
+        (result @(http/put url (assoc opt :body body)))))))
 
 (defn add-usr [{usr :cred-usr-name :as conn}]
   (let [url  (sec-url conn)
         opt  (opts conn :admin)
         body (che/encode {:members {:names [usr] :roles []}})]
-    (result @(http/put url (assoc opt :body body)))))
+    (when (online? url conn)
+      (when-not (exists? url opt)
+        (result @(http/put url (assoc opt :body body)))))))
 
