@@ -34,7 +34,7 @@
 ;;........................................................................
 ;; crypt
 ;;........................................................................
-(defn decrypt-pwd-a [{hash :hash-a secret :cred-admin-secret :as c}]
+(defn decrypt-hash-a [{hash :hash-a secret :cred-admin-secret :as c}]
   (assoc c :cred-admin-pwd (crypto/decrypt hash secret)))
 
 ;;........................................................................
@@ -71,11 +71,12 @@
 (def c conf/conf)
 
 (comment
-  (def d (merge c {:server "e75458",
-                   :port "5984",
-                   :alias "Optische Druckmessung (devhub)",
-                   :level 1,
-                   :hash-a "FjwyQzvCIVPqoowj85s+YA=="}))
+   (def d (decrypt-hash-a
+          (merge c {:server "e75458",
+                    :port "5984",
+                    :alias "Optische Druckmessung (devhub)",
+                    :level 1,
+                    :hash-a "FjwyQzvCIVPqoowj85s+YA=="})))
   
   (db/get-doc (assoc c :id (:repl-doc c)))
   (db/gen-db (assoc c :db "_users"))

@@ -8,16 +8,16 @@
            [java.security SecureRandom]
            [org.apache.commons.codec.binary Base64]))
 
-(defn bytes [s] (.getBytes s "UTF-8"))
+(defn str->bytes [s] (.getBytes s "UTF-8"))
 
-(defn base64 [b] (Base64/encodeBase64String b))
+(defn bytes->base64 [b] (Base64/encodeBase64String b))
   
-(defn debase64 [s] (Base64/decodeBase64 (bytes s)))
+(defn base64->bytes [s] (Base64/decodeBase64 (str->bytes s)))
 
 (defn get-raw-key [seed]
   (let [kg (KeyGenerator/getInstance "AES")
         sr (SecureRandom/getInstance "SHA1PRNG")]
-    (.setSeed sr (bytes seed))
+    (.setSeed sr (str->bytes seed))
     (.init kg 128 sr)
     (.. kg generateKey getEncoded)))
 
@@ -28,8 +28,8 @@
 
 (defn encrypt [s secret]
   (let [cipher (get-cipher Cipher/ENCRYPT_MODE secret)]
-    (base64 (.doFinal cipher (bytes s)))))
+    (bytes->base64 (.doFinal cipher (str->bytes s)))))
 
 (defn decrypt [s secret]
   (let [cipher (get-cipher Cipher/DECRYPT_MODE secret)]
-    (String. (.doFinal cipher (debase64 s)))))
+    (String. (.doFinal cipher (base64->bytes s)))))
