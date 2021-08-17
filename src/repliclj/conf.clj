@@ -1,4 +1,4 @@
-(ns wactbprot.repliclj.conf
+(ns repliclj.conf
   ^{:author "Thomas Bock <wactbprot@gmail.com>"
     :doc "Configuration functions. Merge environment variables."}
   (:require [clojure.edn :as edn]
@@ -21,4 +21,4 @@
 (def conf (merge (get-config) (cred)))
 
 (comment
-  (require :reload 'wactbprot.repliclj.conf))
+  (require :reload 'repliclj.conf))

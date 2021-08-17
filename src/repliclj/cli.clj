@@ -1,10 +1,10 @@
-(ns wactbprot.repliclj.cli
+(ns repliclj.cli
   ^{:author "Thomas Bock <wactbprot@gmail.com>"
     :doc "Command line interface."}
-  (:require [wactbprot.repliclj.db :as db]
-            [wactbprot.repliclj.conf :as conf]
-            [wactbprot.repliclj.crypto :as crypto]
-            [wactbprot.repliclj.log :as log]
+  (:require [repliclj.db :as db]
+            [repliclj.conf :as conf]
+            [repliclj.crypto :as crypto]
+            [repliclj.log :as log]
             [clojure.pprint :as pp]
             [com.brunobonacci.mulog :as µ])
   (:use   [clojure.repl])
@@ -34,7 +34,7 @@
 ;;........................................................................
 ;; crypt
 ;;........................................................................
-(defn decrypt-admin-pwd [{hash :aes-128 secret :cred-admin-secret :as c}]
+(defn decrypt-pwd-a [{hash :hash-a secret :cred-admin-secret :as c}]
   (assoc c :cred-admin-pwd (crypto/decrypt hash secret)))
 
 ;;........................................................................
@@ -46,21 +46,15 @@
 
 (defn ensure-vl-db [c]
   (db/gen-db (assoc c :db "vl_db"))
-  (db-usr (assoc c :db "vl_db"
-                 :cred-usr-name (:cred-cal-name c)
-                 :cred-usr-pwd (:cred-cal-pwd c))))
+  (db-usr (assoc c :db "vl_db")))
 
 (defn ensure-work-db [c]
   (db/gen-db (assoc c :db "vl_db_work"))
-  (db-usr (assoc c :db "vl_db_work"
-                 :cred-usr-name (:cred-cal-name c)
-                 :cred-usr-pwd (:cred-cal-pwd c))))
+  (db-usr (assoc c :db "vl_db_work")))
 
 (defn ensure-bu-db [c]
   (db/gen-db (assoc c :db "vl_db_bu"))
-  (db-usr (assoc c :db "vl_db_bu"
-                 :cred-usr-name (:cred-cal-name c)
-                 :cred-usr-pwd (:cred-cal-pwd c))))
+  (db-usr (assoc c :db "vl_db_bu")))
 
 (defn lvl-0 [c]
   (ensure-users-db c)
@@ -77,13 +71,15 @@
 (def c conf/conf)
 
 (comment
-  (def d {:server "e75458",
-          :port "5984",
-          :alias "optische Druckmessung (devhub)",
-          :level 1,
-          :aes-128 "FjwyQzvCIVPqoowj85s+YA=="}
+  (def d (merge c {:server "e75458",
+                   :port "5984",
+                   :alias "Optische Druckmessung (devhub)",
+                   :level 1,
+                   :hash-a "FjwyQzvCIVPqoowj85s+YA=="}))
+  
   (db/get-doc (assoc c :id (:repl-doc c)))
   (db/gen-db (assoc c :db "_users"))
   (db/gen-db (assoc c :db "_replicator"))
+  
   (gen-usr (assoc c :db "rh" :cred-usr-name "rh"))
   (add-usr (assoc c :db "rh" :cred-usr-name "rh")))

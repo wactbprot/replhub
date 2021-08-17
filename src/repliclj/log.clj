@@ -1,8 +1,8 @@
-(ns wactbprot.repliclj.log
+(ns repliclj.log
   ^{:author "Thomas Bock <wactbprot@gmail.com>"
       :doc "Switch log on and off. Uses [µlog](https://github.com/BrunoBonacci/mulog). 
             Writes direct to elastic search."}
-  (:require [wactbprot.repliclj.conf :as conf]
+  (:require [repliclj.conf :as conf]
             [com.brunobonacci.mulog :as µ]))
 
 (defonce logger (atom nil))
