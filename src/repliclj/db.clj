@@ -24,7 +24,6 @@
 (defn opts
   ([conn] (opts conn :usr))
   ([conn role]
-   (prn conn)
    {:timeout (:timeout conn)
     :basic-auth
     (condp = role
@@ -42,13 +41,13 @@
 ;;........................................................................
 ;; query fuctions
 ;;........................................................................
-(defn exists? [url opt] (contains? (result @(http/head url opt)) :etag))
+(defn exists? [url opt]
+  (let [res @(http/head url opt)]
+    (and (not (contains? res :error)) (< (:status res) 400))))
 
 (defn active-tasks [conn] (result @(http/get (act-url conn) (opts conn :admin))))
 
-(defn get-doc [conn]
-  (let [url (doc-url conn)]
-    (result @(http/get url (opts conn)))))
+(defn get-doc [conn] (result @(http/get (doc-url conn) (opts conn))))
 
 (defn gen-db [conn]
   (let [url (doc-url conn)

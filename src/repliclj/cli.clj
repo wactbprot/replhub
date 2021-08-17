@@ -40,6 +40,8 @@
 ;;........................................................................
 ;; preparation
 ;;........................................................................
+(defn conn [c m] (decrypt-hash-a (merge c m)))
+
 (defn ensure-users-db [c] (db/gen-db (assoc c :db "_users")))
 
 (defn ensure-repli-db [c] (db/gen-db (assoc c :db "_replicator")))
@@ -71,12 +73,13 @@
 (def c conf/conf)
 
 (comment
-   (def d (decrypt-hash-a
-          (merge c {:server "e75458",
-                    :port "5984",
-                    :alias "Optische Druckmessung (devhub)",
-                    :level 1,
-                    :hash-a "FjwyQzvCIVPqoowj85s+YA=="})))
+  (def m  {:server "e75458"
+           :port "5984"
+           :alias "Optische Druckmessung (devhub)"
+           :level 1
+           :hash-a "FjwyQzvCIVPqoowj85s+YA=="})
+  
+  (def e (conn c m))
   
   (db/get-doc (assoc c :id (:repl-doc c)))
   (db/gen-db (assoc c :db "_users"))
