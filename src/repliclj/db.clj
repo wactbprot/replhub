@@ -2,6 +2,7 @@
   ^{:author "Thomas Bock <wactbprot@gmail.com>"
     :doc "Basic database interop. Plain HTTP."}
   (:require [cheshire.core :as che]
+            [clojure.string :as string]
             [org.httpkit.client :as http]
             [com.brunobonacci.mulog :as µ]))
 
@@ -12,7 +13,10 @@
 
 (defn db-url [{db :db :as conn}] (str (base-url conn) "/" db))
 
-(defn doc-url [{id :id :as conn}] (str (db-url conn) "/" id))
+(defn doc-url [{id :id rev :rev :as conn}]
+  (str (db-url conn) "/" id (when rev (str "?rev=" rev))))
+
+(defn repli-docs-url [conn] (str (base-url conn) "/_replicator/_all_docs")) 
 
 (defn usr-url [{usr :cred-usr-name :as conn}] (str (base-url conn) "/_users/org.couchdb.user:" usr))
 
@@ -20,6 +24,9 @@
 
 (defn act-url [conn] (str (base-url conn) "/_active_tasks"))
 
+(defn design-doc? [m]
+  (let [id (or (:_id m) (:id m))]
+    (string/starts-with? id "_design")))
 
 (defn opts [{name :cred-admin-name pwd :cred-admin-pwd t :timeout}]
   {:timeout t
@@ -46,7 +53,7 @@
     (do (µ/log ::exists? :url url :exists true) true)
     (do (µ/log ::exists? :url url :exists false) false)))
 
-(defn active-tasks [conn] (result @(http/get (act-url conn) (opts conn :admin))))
+(defn active-tasks [conn] (result @(http/get (act-url conn) (opts conn))))
 
 (defn get-doc [conn]
   (let [url (doc-url conn) 
@@ -54,6 +61,21 @@
     (when (online? url conn)
       (when (exists? url opt)
       (result @(http/get url opt))))))
+
+(defn del-doc [conn]
+  (let [url (doc-url conn) 
+        opt (opts conn)]
+    (when (online? url conn)
+      (when (exists? url opt)
+        (result @(http/delete url opt))))))
+
+(defn get-repli-docs [conn]
+  (let [url (repli-docs-url conn) 
+        opt (opts conn)]
+    (when (online? url conn)
+      (when (exists? url opt)
+        (when-let [rows (:rows (result @(http/get url opt)))]
+          (filterv #(not (design-doc? %)) rows))))))
 
 (defn gen-db [conn]
   (let [url (db-url conn)

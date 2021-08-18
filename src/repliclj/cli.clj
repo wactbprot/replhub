@@ -7,7 +7,7 @@
             [repliclj.log :as log]
             [clojure.pprint :as pp]
             [com.brunobonacci.mulog :as µ])
-  (:use   [clojure.repl])
+  (:use [clojure.repl])
   (:gen-class))
 
 ;;........................................................................
@@ -18,13 +18,25 @@
 (defn log-stop [c] (log/stop c))
 
 ;;........................................................................
+;; doc
+;;........................................................................
+(defn get-repli-doc [{id :repl-doc :as c}] (db/get-doc (conn (assoc c :id id))))
+
+(defn del-doc [c {id :id {rev :rev} :value}] (db/del-doc (assoc c :id id :rev rev)))
+
+;;........................................................................
 ;; replication
 ;;........................................................................
 (defn act-repl [c] (filterv #(= (:type %) "replication") (db/active-tasks c)))
 
-(defn repl-table [c]
+(defn repli-table [c]
   (let [v [:source :target :continuous :user]]
     (pp/print-table (mapv #(select-keys % v) (act-repl c)))))
+
+(defn repli-stop [c]
+  (let [v (db/get-repli-docs c)
+        c (assoc c :db "_replicator")]
+    (mapv #(del-doc c %) v)))
 
 ;;........................................................................
 ;; crypt
@@ -62,11 +74,12 @@
   (ensure-work-db c)
   (ensure-bu-db c))
 
-(defn prepair-all [{id :repl-doc :as c}]
-  (let [rdoc (:Replications (db/get-doc (conn (assoc c :id id))))]
-    (mapv #(inner-dbs (conn c %)) (:Inner rdoc))
-    (mapv #(outer-dbs (conn c %)) (:Outer rdoc))))
-
+(defn prepair-all [c]
+  (let [rdoc    (:Replications (get-repli-doc c))
+        in-srv  (:Inner rdoc)
+        out-srv (:Outer rdoc)]
+    (mapv #(inner-dbs (conn c %)) in-srv)
+    (mapv #(outer-dbs (conn c %)) out-srv)))
 
 (comment
   (def c conf/conf)
