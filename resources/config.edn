@@ -3,7 +3,9 @@
  :api {:port 8011}
 
  ;; db access
+ :hash-a "oZMcuTS3SVGbjFU2PD/h5Q=="
  :server "127.0.0.1"
+ :db "vl_db"
  :port 5984
  :prot "http"
  :timeout 30000

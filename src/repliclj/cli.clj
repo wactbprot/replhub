@@ -18,11 +18,6 @@
 (defn log-stop [c] (log/stop c))
 
 ;;........................................................................
-;; usr
-;;........................................................................ 
-(defn db-usr [c] (db/gen-usr c) (db/add-usr c))
-
-;;........................................................................
 ;; replication
 ;;........................................................................
 (defn act-repl [c] (filterv #(= (:type %) "replication") (db/active-tasks c)))
@@ -40,50 +35,48 @@
 ;;........................................................................
 ;; preparation
 ;;........................................................................
-(defn conn [c m] (decrypt-hash-a (merge c m)))
-
+(defn conn
+  ([c] (conn c nil))
+  ([c m] (decrypt-hash-a (if m (merge c m) c))))
+  
 (defn ensure-users-db [c] (db/gen-db (assoc c :db "_users")))
 
 (defn ensure-repli-db [c] (db/gen-db (assoc c :db "_replicator")))
 
-(defn ensure-vl-db [c]
-  (db/gen-db (assoc c :db "vl_db"))
-  (db-usr (assoc c :db "vl_db")))
+(defn ensure-db+usr [c] (db/gen-db c) (db/add-usr c))
+  
+(defn ensure-vl-db [c] (ensure-db+usr (assoc c :db "vl_db")))
 
-(defn ensure-work-db [c]
-  (db/gen-db (assoc c :db "vl_db_work"))
-  (db-usr (assoc c :db "vl_db_work")))
+(defn ensure-work-db [c] (ensure-db+usr (assoc c :db "vl_db_work")))
 
-(defn ensure-bu-db [c]
-  (db/gen-db (assoc c :db "vl_db_bu"))
-  (db-usr (assoc c :db "vl_db_bu")))
+(defn ensure-bu-db [c] (ensure-db+usr (assoc c :db "vl_db_bu")))
 
-(defn lvl-0 [c]
+(defn inner-dbs [c]
   (ensure-users-db c)
+  (db/gen-usr c)
   (ensure-repli-db c)
   (ensure-vl-db c))
 
-(defn lvl-1 [c]
-  (ensure-users-db c)
-  (ensure-repli-db c)
-  (ensure-vl-db c)
+(defn outer-dbs [c]
+  (inner-dbs c)
   (ensure-work-db c)
   (ensure-bu-db c))
 
-(def c conf/conf)
+(defn prepair-all [{id :repl-doc :as c}]
+  (let [rdoc (:Replications (db/get-doc (conn (assoc c :id id))))]
+    (mapv #(inner-dbs (conn c %)) (:Inner rdoc))
+    (mapv #(outer-dbs (conn c %)) (:Outer rdoc))))
+
 
 (comment
+  (def c conf/conf)
   (def m  {:server "e75458"
            :port "5984"
            :alias "Optische Druckmessung (devhub)"
-           :level 1
            :hash-a "FjwyQzvCIVPqoowj85s+YA=="})
   
   (def e (conn c m))
   
   (db/get-doc (assoc c :id (:repl-doc c)))
   (db/gen-db (assoc c :db "_users"))
-  (db/gen-db (assoc c :db "_replicator"))
-  
-  (gen-usr (assoc c :db "rh" :cred-usr-name "rh"))
-  (add-usr (assoc c :db "rh" :cred-usr-name "rh")))
+  (db/gen-db (assoc c :db "_replicator")))

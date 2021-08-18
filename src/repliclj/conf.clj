@@ -14,7 +14,6 @@
 (defn cred []
   {:cred-usr-name (or (System/getenv "CAL_USR") "cal")
    :cred-usr-pwd  (System/getenv "CAL_PWD")
-
    :cred-admin-name (or (System/getenv "ADMIN_USR") "admin")
    :cred-admin-secret  (System/getenv "ADMIN_SECRET")})
 

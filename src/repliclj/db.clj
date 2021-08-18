@@ -21,49 +21,50 @@
 (defn act-url [conn] (str (base-url conn) "/_active_tasks"))
 
 
-(defn opts
-  ([conn] (opts conn :usr))
-  ([conn role]
-   {:timeout (:timeout conn)
-    :basic-auth
-    (condp = role
-      :usr   [(:cred-usr-name conn) (:cred-usr-pwd conn)]
-      :admin [(:cred-admin-name conn) (:cred-admin-pwd conn)])}))
+(defn opts [{name :cred-admin-name pwd :cred-admin-pwd t :timeout}]
+  {:timeout t
+   :basic-auth [name pwd]})
 
 (defn result [{body :body header :headers status :status url :url}]
   (let [body (try (che/decode body true)
                   (catch Exception e (µ/log ::result :error (.getMessage e))))]
     (if (< status 400) 
-      (µ/log ::result :status  status :url url)
-      (µ/log ::result :status  status :reason (:reason body) :url url))
-    (or body header)))
+      (do (µ/log ::result :status  status :url url) body)
+      (µ/log ::result :status  status :url url :error (:error body) :reason (:reason body)))))
 
 ;;........................................................................
 ;; query fuctions
 ;;........................................................................
-(defn online? [url opt] (not (contains? @(http/head url opt) :error)))
-
-(defn exists? [url opt]  (< (get @(http/head url opt) :status 400) 400))
+(defn online? [url opt]
+  (if (not (contains? @(http/head url opt) :error))
+    (do (µ/log ::online? :url url :online true) true)
+    (do (µ/log ::online? :url url :online false) false)))
+    
+      
+(defn exists? [url opt]
+  (if (< (get @(http/head url opt) :status 400) 400)
+    (do (µ/log ::exists? :url url :exists true) true)
+    (do (µ/log ::exists? :url url :exists false) false)))
 
 (defn active-tasks [conn] (result @(http/get (act-url conn) (opts conn :admin))))
 
 (defn get-doc [conn]
   (let [url (doc-url conn) 
-        opt (opts conn :admin)]
+        opt (opts conn)]
     (when (online? url conn)
       (when (exists? url opt)
       (result @(http/get url opt))))))
 
 (defn gen-db [conn]
   (let [url (db-url conn)
-        opt (opts conn :admin)]
+        opt (opts conn)]
     (when (online? url conn)
       (when-not (exists? url opt)
         (result @(http/put url opt))))))
 
 (defn gen-usr [{usr :cred-usr-name pwd :cred-usr-pwd :as conn}]
   (let [url  (usr-url conn)
-        opt  (opts conn :admin)
+        opt  (opts conn)
         body (che/encode {:name usr :password pwd :roles [] :type "user"})]
     (when (online? url conn)
       (when-not (exists? url opt)
@@ -71,7 +72,7 @@
 
 (defn add-usr [{usr :cred-usr-name :as conn}]
   (let [url  (sec-url conn)
-        opt  (opts conn :admin)
+        opt  (opts conn)
         body (che/encode {:members {:names [usr] :roles []}})]
     (when (online? url conn)
       (when-not (exists? url opt)
