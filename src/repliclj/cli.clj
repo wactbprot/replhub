@@ -33,7 +33,7 @@
   (let [v [:source :target :continuous :user]]
     (pp/print-table (mapv #(select-keys % v) (act-repl c)))))
 
-(defn repli-stop [c]
+(defn replis-stop [c]
   (let [v (db/get-repli-docs c)
         c (assoc c :db "_replicator")]
     (mapv #(del-doc c %) v)))
@@ -81,6 +81,7 @@
     (mapv #(inner-dbs (conn c %)) in-srv)
     (mapv #(outer-dbs (conn c %)) out-srv)))
 
+
 (comment
   (def c conf/conf)
   (def m  {:server "e75458"
@@ -92,4 +93,8 @@
   
   (db/get-doc (assoc c :id (:repl-doc c)))
   (db/gen-db (assoc c :db "_users"))
-  (db/gen-db (assoc c :db "_replicator")))
+  (db/gen-db (assoc c :db "_replicator"))
+
+  ;; start replication on localhost
+  (db/start-repli (assoc (conn conf/conf) :db "vl_db") (assoc (conn conf/conf) :db "vl_db_work"))
+  )

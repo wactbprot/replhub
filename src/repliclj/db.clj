@@ -24,12 +24,16 @@
 
 (defn act-url [conn] (str (base-url conn) "/_active_tasks"))
 
+(defn gen-repli-id [{a :db} {b :db}] (str a "-to-" b))
+
 (defn design-doc? [m]
   (let [id (or (:_id m) (:id m))]
     (string/starts-with? id "_design")))
 
-(defn opts [{name :cred-admin-name pwd :cred-admin-pwd t :timeout}]
-  {:timeout t
+(defn opts [{name :cred-admin-name pwd :cred-admin-pwd t :timeout} url]
+  {:headers {"Content-Type" "application/json"
+             "Referer" url}
+   :timeout t
    :basic-auth [name pwd]})
 
 (defn result [{body :body header :headers status :status url :url}]
@@ -53,25 +57,35 @@
     (do (µ/log ::exists? :url url :exists true) true)
     (do (µ/log ::exists? :url url :exists false) false)))
 
-(defn active-tasks [conn] (result @(http/get (act-url conn) (opts conn))))
+(defn active-tasks [conn]
+  (let [url (doc-url conn) 
+        opt (opts conn url)]
+    (result @(http/get url opt))))
 
 (defn get-doc [conn]
   (let [url (doc-url conn) 
-        opt (opts conn)]
+        opt (opts conn url)]
     (when (online? url conn)
       (when (exists? url opt)
       (result @(http/get url opt))))))
 
 (defn del-doc [conn]
   (let [url (doc-url conn) 
-        opt (opts conn)]
+        opt (opts conn url)]
     (when (online? url conn)
       (when (exists? url opt)
         (result @(http/delete url opt))))))
 
+(defn post-doc [conn doc]
+  (let [url (doc-url conn) 
+        opt (opts conn url)]
+    (when (online? url conn)
+      (when-not (exists? url opt)
+        (result @(http/put url (assoc opt :body (che/encode doc))))))))
+
 (defn get-repli-docs [conn]
   (let [url (repli-docs-url conn) 
-        opt (opts conn)]
+        opt (opts conn url)]
     (when (online? url conn)
       (when (exists? url opt)
         (when-let [rows (:rows (result @(http/get url opt)))]
@@ -79,24 +93,33 @@
 
 (defn gen-db [conn]
   (let [url (db-url conn)
-        opt (opts conn)]
+        opt (opts conn url)]
     (when (online? url conn)
       (when-not (exists? url opt)
         (result @(http/put url opt))))))
 
 (defn gen-usr [{usr :cred-usr-name pwd :cred-usr-pwd :as conn}]
-  (let [url  (usr-url conn)
-        opt  (opts conn)
-        body (che/encode {:name usr :password pwd :roles [] :type "user"})]
-    (when (online? url conn)
-      (when-not (exists? url opt)
-        (result @(http/put url (assoc opt :body body)))))))
+  (post-doc conn {:name usr :password pwd :roles [] :type "user"}))
 
 (defn add-usr [{usr :cred-usr-name :as conn}]
-  (let [url  (sec-url conn)
-        opt  (opts conn)
-        body (che/encode {:members {:names [usr] :roles []}})]
-    (when (online? url conn)
-      (when-not (exists? url opt)
-        (result @(http/put url (assoc opt :body body)))))))
+  (post-doc conn {:members {:names [usr] :roles []}}))
 
+
+(defn cred-db-url [{prot :prot srv :server port :port name :cred-admin-name pwd :cred-admin-pwd db :db}]
+  (str prot "://" name ":" pwd "@" srv ":" port "/" db))
+
+(defn start-repli
+  ([source target] (start-repli source target false))
+  ([source target cont?]
+   (post-doc (assoc source :db "_replicator" :id (gen-repli-id source target))
+            {:_id (gen-repli-id source target)
+             :source (cred-db-url source)  
+             :target (cred-db-url target)
+             ;; new in version 3.2
+             ;; :target  {:url  (db-url target)
+             ;;          :auth {:basic {:username (:cred-admin-name target)
+             ;;                         :password (:cred-admin-pwd target)}}}
+             
+             :continuous cont?})))
+    
+        
