@@ -1,78 +1,105 @@
 digraph G {
 splines=true;
-	
-subgraph cluster_0 {
-	{
-		node [shape=circle, style=filled, color=skyblue] s_00 s_01
-	}
 
-	node [shape=box, fixedsize=true, width=1.6]; vl_db_00; vl_db_01;
-	
-	s_00 -> vl_db_00 [dir=none, weight=1];
-	s_01 -> vl_db_01 [dir=none, weight=1];
+node [fontsize=11, shape=box, fixedsize=true, width=1, style=filled, color=lightgray];
+vl_db_0[label=<vl_db<SUB>0</SUB>>];
+vl_db_1[label=<vl_db<SUB>1</SUB>>];
+vl_db_2[label=<vl_db<SUB>2</SUB>>];
+vl_db_3[label=<vl_db<SUB>3</SUB>>];
+vl_db_4[label=<vl_db<SUB>4</SUB>>];
+vl_db_5[label=<vl_db<SUB>5</SUB>>];
 
-	vl_db_00 -> vl_db_01[label="cont", len=1.5];
-	vl_db_01 -> vl_db_00[label="cont", len=1.5];
-}
+node [shape=box, fixedsize=true, width=1.2, style=filled, color=lightgray];
+vl_db_work_0[label=<vl_db_work<SUB>0</SUB>>];
+vl_db_work_1[label=<vl_db_work<SUB>1</SUB>>];
+vl_db_work_2[label=<vl_db_work<SUB>2</SUB>>];
+vl_db_work_3[label=<vl_db_work<SUB>3</SUB>>];
+vl_db_work_4[label=<vl_db_work<SUB>4</SUB>>];
+vl_db_work_5[label=<vl_db_work<SUB>5</SUB>>];
 
-{
-	node [shape=circle, style=filled, color=skyblue] s_10 s_11; s_12 s_13
-}
+node [shape=circle, style=filled, color=skyblue, width=0.8]
+s_0[label=<server<SUB>0</SUB>>];
+s_1[label=<server<SUB>1</SUB>>];
+s_2[label=<server<SUB>2</SUB>>];
+s_3[label=<server<SUB>3</SUB>>];
+s_4[label=<server<SUB>4</SUB>>];
+s_5[label=<server<SUB>5</SUB>>];
 
-node [shape=box, fixedsize=true, width=1.6];
-vl_db_work_10; vl_db_work_11; vl_db_work_12; vl_db_work_13;
-vl_db_10; vl_db_11; vl_db_12; vl_db_13;
-vl_db_bu_10; vl_db_bu_11; vl_db_bu_12; vl_db_bu_13;  
-
-s_10 -> vl_db_10 [dir=none, weight=1];
-s_11 -> vl_db_11 [dir=none, weight=1];
-s_12 -> vl_db_12 [dir=none, weight=1];
-s_13 -> vl_db_13 [dir=none, weight=1];
-
-vl_db_00 -> vl_db_10[len=2, label="cont"];
-vl_db_01 -> vl_db_10[len=2, label="cont"];
-vl_db_00 -> vl_db_11[len=2, label="cont"];
-vl_db_01 -> vl_db_11[len=2, label="cont"];
-vl_db_00 -> vl_db_12[len=2, label="cont"];
-vl_db_01 -> vl_db_12[len=2, label="cont"];
-vl_db_00 -> vl_db_13[len=2, label="cont"];
-vl_db_01 -> vl_db_13[len=2, label="cont"];
-
-vl_db_10 -> vl_db_00[label="cont"];
-vl_db_10 -> vl_db_01[label="cont"];
-vl_db_11 -> vl_db_00[label="cont"];
-vl_db_11 -> vl_db_01[label="cont"];
-vl_db_12 -> vl_db_00[label="cont"];
-vl_db_12 -> vl_db_01[label="cont"];
-vl_db_13 -> vl_db_00[label="cont"];
-vl_db_13 -> vl_db_01[label="cont"];
-
-s_10 -> vl_db_work_10 [dir=none, weight=1];
-s_11 -> vl_db_work_11 [dir=none, weight=1];
-s_12 -> vl_db_work_12 [dir=none, weight=1];
-s_13 -> vl_db_work_13 [dir=none, weight=1];
-s_10 -> vl_db_bu_10 [dir=none, weight=1];
-s_11 -> vl_db_bu_11 [dir=none, weight=1];
-s_12 -> vl_db_bu_12 [dir=none, weight=1];
-s_13 -> vl_db_bu_13 [dir=none, weight=1];
-
-vl_db_10 -> vl_db_work_10[label="cont"];
-vl_db_11 -> vl_db_work_11[label="cont"];
-vl_db_12 -> vl_db_work_12[label="cont"];
-vl_db_13 -> vl_db_work_13[label="cont"];
+vl_db_0 -> vl_db_work_0[len=2, label="c"];
+vl_db_1 -> vl_db_work_1[len=2, label="c"];
+vl_db_2 -> vl_db_work_2[len=2, label="c"];
+vl_db_3 -> vl_db_work_3[len=2, label="c"];
+vl_db_4 -> vl_db_work_4[len=2, label="c"];
+vl_db_5 -> vl_db_work_5[len=2, label="c"];
 
 
-vl_db_work_10 -> vl_db_10[label="trig"];
-vl_db_work_11 -> vl_db_11[label="trig"];
-vl_db_work_12 -> vl_db_12[label="trig"];
-vl_db_work_13 -> vl_db_13[label="trig"];
+vl_db_work_0 -> vl_db_0[len=2, label="t", style=dotted];
+vl_db_work_1 -> vl_db_1[len=2, label="t", style=dotted];
+vl_db_work_2 -> vl_db_2[len=2, label="t", style=dotted];
+vl_db_work_3 -> vl_db_3[len=2, label="t", style=dotted];
+vl_db_work_4 -> vl_db_4[len=2, label="t", style=dotted];
+vl_db_work_5 -> vl_db_5[len=2, label="t", style=dotted];
 
-vl_db_10 -> vl_db_bu_10[label="peri"];
-vl_db_11 -> vl_db_bu_11[label="peri"];
-vl_db_12 -> vl_db_bu_12[label="peri"];
-vl_db_13 -> vl_db_bu_13[label="peri"];
+
+vl_db_0 -> vl_db_1[len=3, label="c"];
+vl_db_0 -> vl_db_2[len=3, label="c"];
+vl_db_0 -> vl_db_3[len=3, label="c"];
+vl_db_0 -> vl_db_4[len=3, label="c"];
+vl_db_0 -> vl_db_5[len=3, label="c"];
+
+vl_db_1 -> vl_db_0[len=3, label="c"];
+vl_db_1 -> vl_db_2[len=3, label="c"];
+vl_db_1 -> vl_db_3[len=3, label="c"];
+vl_db_1 -> vl_db_4[len=3, label="c"];
+vl_db_1 -> vl_db_5[len=3, label="c"];
+
+
+vl_db_2 -> vl_db_0[len=3, label="c"];
+vl_db_2 -> vl_db_1[len=3, label="c"];
+vl_db_2 -> vl_db_3[len=3, label="c"];
+vl_db_2 -> vl_db_4[len=3, label="c"];
+vl_db_2 -> vl_db_5[len=3, label="c"];
+
+
+vl_db_3 -> vl_db_0[len=3, label="c"];
+vl_db_3 -> vl_db_1[len=3, label="c"];
+vl_db_3 -> vl_db_2[len=3, label="c"];
+vl_db_3 -> vl_db_4[len=3, label="c"];
+vl_db_3 -> vl_db_5[len=3, label="c"];
+
+vl_db_4 -> vl_db_0[len=3, label="c"];
+vl_db_4 -> vl_db_1[len=3, label="c"];
+vl_db_4 -> vl_db_2[len=3, label="c"];
+vl_db_4 -> vl_db_3[len=3, label="c"];
+vl_db_4 -> vl_db_5[len=3, label="c"];
+
+
+vl_db_5 -> vl_db_0[len=3, label="c"];
+vl_db_5 -> vl_db_1[len=3, label="c"];
+vl_db_5 -> vl_db_2[len=3, label="c"];
+vl_db_5 -> vl_db_3[len=3, label="c"];
+vl_db_5 -> vl_db_4[len=3, label="c"];
+
+
+s_0 -> vl_db_0 [dir=none];
+s_0 -> vl_db_work_0 [dir=none];
+
+s_1 -> vl_db_1 [dir=none];
+s_1 -> vl_db_work_1 [dir=none];
+
+s_2 -> vl_db_2 [dir=none];
+s_2 -> vl_db_work_2 [dir=none];
+
+s_3 -> vl_db_3 [dir=none];
+s_3 -> vl_db_work_3 [dir=none];
+
+s_4 -> vl_db_4 [dir=none];
+s_4 -> vl_db_work_4 [dir=none];
+
+s_5 -> vl_db_5 [dir=none];
+s_5 -> vl_db_work_5 [dir=none];
 
 overlap=false
-label="Replication Model"
+label="Replication Model (N=6)"
 fontsize=12;
 }

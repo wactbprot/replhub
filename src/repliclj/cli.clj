@@ -18,6 +18,19 @@
 (defn log-stop [c] (log/stop c))
 
 ;;........................................................................
+;; crypt
+;;........................................................................
+(defn decrypt-hash-a [{hash :hash-a secret :cred-admin-secret :as c}]
+  (assoc c :cred-admin-pwd (crypto/decrypt hash secret)))
+
+;;........................................................................
+;; preparation
+;;........................................................................
+(defn conn
+  ([c] (conn c nil))
+  ([c m] (decrypt-hash-a (if m (merge c m) c))))
+
+;;........................................................................
 ;; doc
 ;;........................................................................
 (defn get-repli-doc [{id :repl-doc :as c}] (db/get-doc (conn (assoc c :id id))))
@@ -38,18 +51,6 @@
         c (assoc c :db "_replicator")]
     (mapv #(del-doc c %) v)))
 
-;;........................................................................
-;; crypt
-;;........................................................................
-(defn decrypt-hash-a [{hash :hash-a secret :cred-admin-secret :as c}]
-  (assoc c :cred-admin-pwd (crypto/decrypt hash secret)))
-
-;;........................................................................
-;; preparation
-;;........................................................................
-(defn conn
-  ([c] (conn c nil))
-  ([c m] (decrypt-hash-a (if m (merge c m) c))))
   
 (defn ensure-users-db [c] (db/gen-db (assoc c :db "_users")))
 
@@ -61,29 +62,33 @@
 
 (defn ensure-work-db [c] (ensure-db+usr (assoc c :db "vl_db_work")))
 
-(defn ensure-bu-db [c] (ensure-db+usr (assoc c :db "vl_db_bu")))
-
-(defn inner-dbs [c]
+(defn prepair-db [c]
   (ensure-users-db c)
   (db/gen-usr c)
   (ensure-repli-db c)
-  (ensure-vl-db c))
+  (ensure-vl-db c)
+  (ensure-work-db c))
 
-(defn outer-dbs [c]
-  (inner-dbs c)
-  (ensure-work-db c)
-  (ensure-bu-db c))
+(defn prepair-dbs [c]
+  (let [rdoc (:Replications (get-repli-doc c))]
+    (mapv #(prepair-db (conn c %)) rdoc)))
 
-(defn prepair-all [c]
-  (let [rdoc    (:Replications (get-repli-doc c))
-        in-srv  (:Inner rdoc)
-        out-srv (:Outer rdoc)]
-    (mapv #(inner-dbs (conn c %)) in-srv)
-    (mapv #(outer-dbs (conn c %)) out-srv)))
+(defn inner-repli [c]
+  (let [rdoc (:Replications (get-repli-doc c))]
+    (mapv #(db/start-repli (assoc (conn c %) :db "vl_db")
+                           (assoc (conn c %) :db "vl_db_work")) rdoc)))
 
+(defn outer-repli [c]
+  (let [rdoc (:Replications (get-repli-doc c))]
+    (mapv #(let [m (nth rdoc %)]
+             (mapv #(when (not= m %)
+                      (db/start-repli (assoc (conn c m) :db "vl_db")
+                                      (assoc (conn c %) :db "vl_db")))
+                   rdoc)))
+    (range (count rdoc))))
 
 (comment
-  (def c conf/conf)
+  (def c (conn conf/conf))
   (def m  {:server "e75458"
            :port "5984"
            :alias "Optische Druckmessung (devhub)"
@@ -96,5 +101,4 @@
   (db/gen-db (assoc c :db "_replicator"))
 
   ;; start replication on localhost
-  (db/start-repli (assoc (conn conf/conf) :db "vl_db") (assoc (conn conf/conf) :db "vl_db_work"))
-  )
+  (db/start-repli (assoc c :db "vl_db") (assoc c :db "vl_db_work")))

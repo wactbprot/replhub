@@ -24,7 +24,9 @@
 
 (defn act-url [conn] (str (base-url conn) "/_active_tasks"))
 
-(defn gen-repli-id [{a :db} {b :db}] (str a "-to-" b))
+(defn host [s] (first (string/split s #"\.")))
+
+(defn gen-repli-id [{ad :db as :server} {bd :db bs :server}] (str ad "@" (host as)  "--" bd "@" (host bs)))
 
 (defn design-doc? [m]
   (let [id (or (:_id m) (:id m))]
@@ -50,8 +52,7 @@
   (if (not (contains? @(http/head url opt) :error))
     (do (µ/log ::online? :url url :online true) true)
     (do (µ/log ::online? :url url :online false) false)))
-    
-      
+          
 (defn exists? [url opt]
   (if (< (get @(http/head url opt) :status 400) 400)
     (do (µ/log ::exists? :url url :exists true) true)
@@ -99,17 +100,26 @@
         (result @(http/put url opt))))))
 
 (defn gen-usr [{usr :cred-usr-name pwd :cred-usr-pwd :as conn}]
-  (post-doc conn {:name usr :password pwd :roles [] :type "user"}))
-
+  (let [url (usr-url conn) 
+        opt (opts conn url)
+        doc {:name usr :password pwd :roles [] :type "user"}]
+    (when (online? url conn)
+      (when-not (exists? url opt)
+        (result @(http/put url (assoc opt :body (che/encode doc))))))))
+  
 (defn add-usr [{usr :cred-usr-name :as conn}]
-  (post-doc conn {:members {:names [usr] :roles []}}))
+  (let [url (sec-url conn) 
+        opt (opts conn url)
+        doc {:members {:names [usr] :roles []}}]
+    (when (online? url conn)
+      (result @(http/put url (assoc opt :body (che/encode doc)))))))
 
 
 (defn cred-db-url [{prot :prot srv :server port :port name :cred-admin-name pwd :cred-admin-pwd db :db}]
   (str prot "://" name ":" pwd "@" srv ":" port "/" db))
 
 (defn start-repli
-  ([source target] (start-repli source target false))
+  ([source target] (start-repli source target true))
   ([source target cont?]
    (post-doc (assoc source :db "_replicator" :id (gen-repli-id source target))
             {:_id (gen-repli-id source target)
