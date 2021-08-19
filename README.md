@@ -1,6 +1,6 @@
 # RepliClj
 
-Replica + Clj = RepliClj
+<img src="model.png" alt="model" id="logo">
 
 Keep CouchDB (v3) replications alive, generate database users, visualize replication status.
 
