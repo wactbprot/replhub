@@ -13,17 +13,16 @@ Keep CouchDB (v3) replications alive, generate database users, visualize replica
 
 ## Environment vars
 
-Some operations need admin rights: generate the `_users` and
-`_replicator` datebase furthermore the generation and adding a user
-that manages the replication. The following environment variables should be set:
+Most operations need admin rights e.g. the generation of the `_users`,
+`_replicator` etc. datebases and the generation and adding the
+`cal` user. The following environment variables should be set:
 
 * `export ADMIN_USR=<admins name>` (defaults to "admin")
-* `export ADMIN_PWD=<admins password>`
-* `export REPLICLJ_USR=< users name>` (defaults to "rcusr")
-* `export REPLICLJ_PWD=< users password>`
+* `export ADMIN_SECRET=<admins secret>` **this is not the password**
+* `export CAL_USR=< users name>` (defaults to "cal")
+* `export CAL_PWD=< users password>`
 
-
-## note
+## notes
 
 ### model graph
 

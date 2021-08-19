@@ -40,11 +40,9 @@
 ;;........................................................................
 ;; replication
 ;;........................................................................
-(defn act-repl [c] (filterv #(= (:type %) "replication") (db/active-tasks c)))
-
 (defn repli-table [c]
-  (let [v [:source :target :continuous :user]]
-    (pp/print-table (mapv #(select-keys % v) (act-repl c)))))
+  (let [v [:doc_id :state  :error_count :start_time :last_updated ]]
+    (pp/print-table (mapv #(select-keys % v) (db/repli-docs c)))))
 
 (defn replis-stop [c]
   (let [v (db/get-repli-docs c)

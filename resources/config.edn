@@ -1,8 +1,9 @@
 {:app-name "repliclj"
+
  ;; gui server
  :api {:port 8011}
 
- ;; db access
+ ;; bootstrap db access
  :hash-a "oZMcuTS3SVGbjFU2PD/h5Q=="
  :server "localhost"
  :db "vl_db"

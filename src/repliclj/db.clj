@@ -22,7 +22,7 @@
 
 (defn sec-url [conn] (str (db-url conn) "/_security"))
 
-(defn act-url [conn] (str (base-url conn) "/_active_tasks"))
+(defn act-url [conn] (str (base-url conn) "/_scheduler/docs/_replicator/"))
 
 (defn host [s] (first (string/split s #"\.")))
 
@@ -58,10 +58,10 @@
     (do (µ/log ::exists? :url url :exists true) true)
     (do (µ/log ::exists? :url url :exists false) false)))
 
-(defn active-tasks [conn]
-  (let [url (doc-url conn) 
+(defn repli-docs [conn]
+  (let [url (act-url conn) 
         opt (opts conn url)]
-    (result @(http/get url opt))))
+   (:docs (result @(http/get url opt)))))
 
 (defn get-doc [conn]
   (let [url (doc-url conn) 
