@@ -1,6 +1,7 @@
 (ns repliclj.server
   (:require [compojure.route :as route]
             [com.brunobonacci.mulog :as µ]
+            [repliclj.cli :as cli]
             [repliclj.page :as page]
             [repliclj.conf :as conf]
             [repliclj.log :as log]
@@ -14,7 +15,7 @@
 (defonce server (atom nil))
 
 (defroutes app-routes
-  (GET "/" [:as req] (page/index conf/conf req))
+  (GET "/" [:as req] (page/index conf/conf (cli/replis-docs conf/conf)))
   
   (route/resources "/")
   (route/not-found (page/not-found)))

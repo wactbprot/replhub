@@ -33,7 +33,7 @@
 ;;........................................................................
 ;; doc
 ;;........................................................................
-(defn get-repli-doc [{id :repl-doc :as c}] (db/get-doc (conn (assoc c :id id))))
+(defn get-repli-doc [{id :repl-doc :as c}] (:Replications (db/get-doc (conn (assoc c :id id)))))
 
 (defn del-doc [c {id :id {rev :rev} :value}] (db/del-doc (assoc c :id id :rev rev)))
 
@@ -44,12 +44,30 @@
   (let [v [:doc_id :state  :error_count :start_time :last_updated ]]
     (pp/print-table (mapv #(select-keys % v) (db/repli-docs c)))))
 
+(defn replis-docs [c] 
+  (let [rdoc (get-repli-doc c)]
+    (mapv #(db/repli-docs (conn c %)) rdoc)))
+
 (defn replis-stop [c]
   (let [v (db/get-repli-docs c)
         c (assoc c :db "_replicator")]
     (mapv #(del-doc c %) v)))
 
-  
+
+(defn inner-repli [c]
+  (let [rdoc  (get-repli-doc c)]
+    (mapv #(db/start-repli (assoc (conn c %) :db "vl_db")
+                           (assoc (conn c %) :db "vl_db_work")) rdoc)))
+
+(defn outer-repli [c]
+  (let [rdoc (get-repli-doc c)]
+    (mapv #(let [m (nth rdoc %)]
+             (mapv #(when (not= m %)
+                      (db/start-repli (assoc (conn c m) :db "vl_db")
+                                      (assoc (conn c %) :db "vl_db")))
+                   rdoc)))
+    (range (count rdoc))))
+
 (defn ensure-users-db [c] (db/gen-db (assoc c :db "_users")))
 
 (defn ensure-repli-db [c] (db/gen-db (assoc c :db "_replicator")))
@@ -68,22 +86,8 @@
   (ensure-work-db c))
 
 (defn prepair-dbs [c]
-  (let [rdoc (:Replications (get-repli-doc c))]
+  (let [rdoc (get-repli-doc c)]
     (mapv #(prepair-db (conn c %)) rdoc)))
-
-(defn inner-repli [c]
-  (let [rdoc (:Replications (get-repli-doc c))]
-    (mapv #(db/start-repli (assoc (conn c %) :db "vl_db")
-                           (assoc (conn c %) :db "vl_db_work")) rdoc)))
-
-(defn outer-repli [c]
-  (let [rdoc (:Replications (get-repli-doc c))]
-    (mapv #(let [m (nth rdoc %)]
-             (mapv #(when (not= m %)
-                      (db/start-repli (assoc (conn c m) :db "vl_db")
-                                      (assoc (conn c %) :db "vl_db")))
-                   rdoc)))
-    (range (count rdoc))))
 
 (comment
   (def c (conn conf/conf))

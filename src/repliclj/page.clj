@@ -24,15 +24,15 @@
 (defn body [conf data]
   [:body#body
    (nav conf data)
-   
+   [:pre
+   (str data)]
    
    (hp/include-js "/js/jquery.js")
    (hp/include-js "/js/uikit.js")
-   (hp/include-js "/js/uikit-icons.js")
-   (hp/include-js "/js/ws.js")])
+   (hp/include-js "/js/uikit-icons.js")])
 
 (defn head [conf data]
-  [:head [:title "metis"]
+  [:head [:title "repliclj"]
    [:meta {:charset "utf-8"}]
    [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
    (hp/include-css "/css/uikit.css")])
