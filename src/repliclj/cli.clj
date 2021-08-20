@@ -48,10 +48,9 @@
   (let [rdoc (get-repli-doc c)]
     (mapv (fn [m] {(:server m) (db/repli-docs (conn c m))}) rdoc)))
 
-(defn stop-repli [c server]
-
-  (db/start-repli (conn c source) (conn c target)))
-
+;;........................................................................
+;; replication stop
+;;........................................................................
 (defn repli-stop 
   "Stops all replications at `c`."
   [c]
@@ -59,13 +58,21 @@
         c (assoc c :db "_replicator")]
     (mapv #(del-doc c %) v)))
 
+(defn replis-stop
+  "Stops all replications on the entire system."
+  [c]
+  (mapv repli-stop (get-repli-doc c)))
+
+;;........................................................................
+;; replication start
+;;........................................................................
 (defn start-repli 
-  "Starts a replicationn from `source`to `target`."
+  "Starts a replications from `source`to `target`."
   [c source target]
   (db/start-repli (conn c source) (conn c target)))
 
 (defn inner-replis [c]
-  (let [rdoc  (get-repli-doc c)]
+  (let [rdoc (get-repli-doc c)]
     (mapv #(start-repli c (assoc % :db "vl_db") (assoc % :db "vl_db_work"))
           rdoc)))
 
@@ -77,6 +84,11 @@
                        (start-repli c (assoc source :db "vl_db") (assoc target :db "vl_db"))))
                    rdoc))
           (range (count rdoc)))))
+
+(defn replis-start [c]
+  "Starts the inner and outer replications of the entire system"
+  (inner-replis c)
+  (outer-replis c))
 
 ;;........................................................................
 ;; database and usr
