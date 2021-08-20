@@ -15,7 +15,7 @@
 (defonce server (atom nil))
 
 (defroutes app-routes
-  (GET "/" [:as req] (page/index conf/conf (cli/replis-docs conf/conf)))
+  (GET "/table" [] (page/index conf/conf (cli/replis-docs conf/conf) :table))
   
   (route/resources "/")
   (route/not-found (page/not-found)))

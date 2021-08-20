@@ -61,7 +61,8 @@
 (defn repli-docs [conn]
   (let [url (act-url conn) 
         opt (opts conn url)]
-   (:docs (result @(http/get url opt)))))
+    (when (online? url conn)
+      (:docs (result @(http/get url opt))))))
 
 (defn get-doc [conn]
   (let [url (doc-url conn) 

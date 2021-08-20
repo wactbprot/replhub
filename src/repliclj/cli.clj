@@ -46,33 +46,46 @@
 
 (defn replis-docs [c] 
   (let [rdoc (get-repli-doc c)]
-    (mapv #(db/repli-docs (conn c %)) rdoc)))
+    (mapv (fn [m] {(:server m) (db/repli-docs (conn c m))}) rdoc)))
 
-(defn replis-stop [c]
+(defn stop-repli [c server]
+
+  (db/start-repli (conn c source) (conn c target)))
+
+(defn repli-stop 
+  "Stops all replications at `c`."
+  [c]
   (let [v (db/get-repli-docs c)
         c (assoc c :db "_replicator")]
     (mapv #(del-doc c %) v)))
 
+(defn start-repli 
+  "Starts a replicationn from `source`to `target`."
+  [c source target]
+  (db/start-repli (conn c source) (conn c target)))
 
-(defn inner-repli [c]
+(defn inner-replis [c]
   (let [rdoc  (get-repli-doc c)]
-    (mapv #(db/start-repli (assoc (conn c %) :db "vl_db")
-                           (assoc (conn c %) :db "vl_db_work")) rdoc)))
+    (mapv #(start-repli c (assoc % :db "vl_db") (assoc % :db "vl_db_work"))
+          rdoc)))
 
-(defn outer-repli [c]
+(defn outer-replis [c]
   (let [rdoc (get-repli-doc c)]
-    (mapv #(let [m (nth rdoc %)]
-             (mapv #(when (not= m %)
-                      (db/start-repli (assoc (conn c m) :db "vl_db")
-                                      (assoc (conn c %) :db "vl_db")))
-                   rdoc)))
-    (range (count rdoc))))
+    (mapv #(let [source (nth rdoc %)]
+             (mapv (fn [target]
+                     (when (not= source target)
+                       (start-repli c (assoc source :db "vl_db") (assoc target :db "vl_db"))))
+                   rdoc))
+          (range (count rdoc)))))
+
+;;........................................................................
+;; database and usr
+;;........................................................................
+(defn ensure-db+usr [c] (db/gen-db c) (db/add-usr c))
 
 (defn ensure-users-db [c] (db/gen-db (assoc c :db "_users")))
 
 (defn ensure-repli-db [c] (db/gen-db (assoc c :db "_replicator")))
-
-(defn ensure-db+usr [c] (db/gen-db c) (db/add-usr c))
   
 (defn ensure-vl-db [c] (ensure-db+usr (assoc c :db "vl_db")))
 
@@ -89,8 +102,13 @@
   (let [rdoc (get-repli-doc c)]
     (mapv #(prepair-db (conn c %)) rdoc)))
 
+;;........................................................................
+;; playground
+;;........................................................................
 (comment
+  ;; use conn to resolve pwd
   (def c (conn conf/conf))
+  
   (def m  {:server "e75458"
            :port "5984"
            :alias "Optische Druckmessung (devhub)"
