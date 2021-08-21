@@ -16,6 +16,7 @@
 
 (defroutes app-routes
   (GET "/table" [] (page/index conf/conf (cli/replis-docs conf/conf) :table))
+  (GET "/graph" [] (page/index conf/conf (cli/replis-docs conf/conf) :graph))
   
   (route/resources "/")
   (route/not-found (page/not-found)))
