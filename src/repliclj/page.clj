@@ -9,7 +9,7 @@
 ;;........................................................................
 (defn date [] (.format (new java.text.SimpleDateFormat "yyyy-MM-dd HH:mm") (java.util.Date.)))
 
-(defn nice-repl-doc-id [s] (string/replace s  #"\-\-" "&nbsp;&nbsp;⟶ &nbsp;&nbsp;"))
+(defn url->db [s] (last (string/split u #"/")))
 
 (defn nice-date [s] (string/replace s #"[TZ]" "&nbsp;&nbsp;&nbsp;"))
 
@@ -42,7 +42,8 @@
 ;;........................................................................
 (defn table-row [m]
   [:tr
-   [:td (nice-repl-doc-id (:doc_id m))]
+   [:td (url->db (:source m))]
+   [:td (url->db (:target m))]
    [:td (:state m)]
    [:td (:changes_pending (:info m))] 
    [:td (:error_count m)]
@@ -52,7 +53,8 @@
 (defn table [v]
   [:table.uk-table.uk-table-hover.uk-table-striped
    [:thead [:tr
-            [:th "replication"]
+            [:th "source db"]
+            [:th "target db"]
             [:th "status"]
             [:th {:uk-tooltip "pending changes"} "cp"]
             [:th {:uk-tooltip "error count"} "ec"]
