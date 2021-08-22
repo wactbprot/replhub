@@ -33,9 +33,11 @@
 ;;........................................................................
 ;; doc
 ;;........................................................................
-(defn get-repli-doc [{id :repl-doc :as c}] (:Replications (db/get-doc (conn (assoc c :id id)))))
+(defn get-repli-doc [{id :repl-doc :as c}]
+  (:Replications (db/get-doc (conn (assoc c :id id)))))
 
-(defn del-doc [c {id :id {rev :rev} :value}] (db/del-doc (assoc c :id id :rev rev)))
+(defn del-doc [c {id :id {rev :rev} :value}]
+  (db/del-doc (assoc c :id id :rev rev)))
 
 ;;........................................................................
 ;; replication

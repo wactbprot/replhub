@@ -1,7 +1,17 @@
 (ns repliclj.page
+  ^{:author "Thomas Bock <wactbprot@gmail.com>"
+    :doc "Simple replication state overview page delivered by server.clj."}
   (:require [hiccup.form :as hf]
             [hiccup.page :as hp]
             [clojure.string :as string]))
+;;........................................................................
+;; utils
+;;........................................................................
+(defn date [] (.format (new java.text.SimpleDateFormat "yyyy-MM-dd HH:mm") (java.util.Date.)))
+
+(defn nice-repl-doc-id [s] (string/replace s  #"\-\-" "&nbsp;&nbsp;⟶ &nbsp;&nbsp;"))
+
+(defn nice-date [s] (string/replace s #"[TZ]" "&nbsp;&nbsp;&nbsp;"))
 
 (defn not-found []
   (hp/html5
@@ -9,7 +19,9 @@
    [:b "Page not found!"]
    [:p [:a {:href ".."} "Return to main page"]]))
 
-
+;;........................................................................
+;; nav
+;;........................................................................
 (defn nav [conf data]
   [:div.uk-navbar-container
    {:uk-navbar ""}
@@ -20,11 +32,14 @@
                 :href "https://github.com/wactbprot/repliclj"}]]
       [:li [:a {:target "_blank"
                 :href "http://a75438:5601/app/discover"} "elasticsearch"]]]]])
+;;........................................................................
+;; graph
+;;........................................................................
+(defn graph [conf data] [:div.uk-container {:id "graph" :style "height:960px;"}]) 
 
-(defn nice-repl-doc-id [s] (string/replace s  #"\-\-" " &nbsp; &nbsp;⟶ &nbsp; &nbsp;"))
-
-(defn nice-date [s] (string/replace s #"[TZ]" "&nbsp;&nbsp;&nbsp;"))
-
+;;........................................................................
+;; table
+;;........................................................................
 (defn table-row [m]
   [:tr
    [:td (nice-repl-doc-id (:doc_id m))]
@@ -33,7 +48,6 @@
    [:td (:error_count m)]
    [:td (nice-date (:start_time m))]
    [:td (nice-date (:last_updated m))]])
-
 
 (defn table [v]
   [:table.uk-table.uk-table-hover.uk-table-striped
@@ -61,28 +75,35 @@
       [:div.uk-text-muted.uk-text-left sum]
       [:div.uk-width-expand.uk-grid-column-medium.uk-text-right title]]
      [:div.uk-accordion-content (table data)]]))
-  
-(defn accord [conf data]
-  (into [:ul {:uk-accordion ""}] (mapv li data)))
 
-(defn graph [conf data] [:div.uk-container {:id "graph" :style "height:960px;"}]) 
+(defn accord [conf data] (into [:ul {:uk-accordion ""}] (mapv li data)))
 
+;;........................................................................
+;; body
+;;........................................................................
 (defn body [conf data content libs]
   (into [:body#body
          (nav conf data)
          [:div.uk-container.uk-padding
           [:article.uk-article
-           [:h3.uk-article-title.uk-text-uppercase.uk-heading-line.uk-text-center [:a.uk-link-reset {:href ""} "replication state"]]
-           [:p.uk-article-meta (.format (new java.text.SimpleDateFormat "yyyy-MM-dd HH:mm") (java.util.Date.))]
+           [:h3.uk-article-title.uk-text-uppercase.uk-heading-line.uk-text-center
+            [:a.uk-link-reset {:href ""} "replication state"]]
+           [:p.uk-article-meta (date)]
            [:p.uk-text-lead
             content]]]] libs))
-  
+
+;;........................................................................
+;; head
+;;........................................................................
 (defn head [conf data]
   [:head [:title "repliclj"]
    [:meta {:charset "utf-8"}]
    [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
    (hp/include-css "/css/uikit.css")])
 
+;;........................................................................
+;; index
+;;........................................................................
 (defn index [conf data content]
   (hp/html5
    (head conf data)

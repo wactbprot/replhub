@@ -1,4 +1,7 @@
 (ns repliclj.server
+  ^{:author "Thomas Bock <wactbprot@gmail.com>"
+    :doc "Webserver delivers overview page and keeps the system
+    alive. Triggers replication check."}
   (:require [compojure.route :as route]
             [com.brunobonacci.mulog :as µ]
             [repliclj.cli :as cli]
@@ -6,15 +9,15 @@
             [repliclj.conf :as conf]
             [repliclj.log :as log]
             [compojure.core :refer :all]
-            [compojure.handler        :as handler]
+            [compojure.handler :as handler]
             [org.httpkit.server :refer [run-server]]
             [ring.middleware.json :as middleware])
   (:gen-class))
 
-
 (defonce server (atom nil))
 
 (defroutes app-routes
+  
   (GET "/table" [] (page/index conf/conf (cli/replis-docs conf/conf) :table))
   (GET "/graph" [] (page/index conf/conf (cli/replis-docs conf/conf) :graph))
   
