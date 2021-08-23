@@ -2,7 +2,8 @@
   ^{:author "Thomas Bock <wactbprot@gmail.com>"
     :doc "Webserver delivers overview page and keeps the system
     alive. Triggers replication check."}
-  (:require [compojure.route :as route]
+  (:require [overtone.at-at :as at]
+            [compojure.route :as route]
             [com.brunobonacci.mulog :as µ]
             [repliclj.cli :as cli]
             [repliclj.page :as page]
@@ -14,7 +15,14 @@
             [ring.middleware.json :as middleware])
   (:gen-class))
 
+(defonce at-pool (at/mk-pool))
+
+(defonce at-every (atom nil))
+
 (defonce server (atom nil))
+
+(defonce rdoc (atom (cli/get-repli-doc (cli/conn conf/conf))))
+
 
 (defroutes app-routes
   
@@ -31,10 +39,20 @@
 
 (defn stop [c]
   (when @server (@server :timeout 100)
+        (at/stop @at-every)
         (log/stop c)
         (reset! server nil)))
 
-(defn start [c]
+(defn check [c]
+  (when-let [cdoc (cli/get-repli-doc (cli/conn c))]
+    (when-let [nsrv (cli/new-servers @rdoc cdoc)]
+      (µ/log ::check :message "found new entries")
+      (cli/prepair-dbs c nsrv)
+      (cli/replis-start c nsrv)
+      (reset! rdoc cdoc))))
+      
+(defn start [{i :check-interval :as c}]
+  (reset! at-every (at/every i #(check c)  at-pool))
   (log/start c)
   (µ/log ::start :message "start repliclj server")
   (reset! server (run-server app (:api c))))
@@ -43,3 +61,6 @@
 (defn -main [& args]
   (µ/log ::-main :message "call -main")
   (start conf/conf))
+
+(comment
+  (stop-and-reset-pool! at-pool))

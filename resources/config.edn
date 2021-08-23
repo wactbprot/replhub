@@ -1,5 +1,7 @@
 {:app-name "repliclj"
-
+ ;; check for changes
+ :check-interval 60000
+ 
  ;; gui server
  :api {:port 8011}
 
@@ -9,7 +11,7 @@
  :db "vl_db"
  :port 5984
  :prot "http"
- :timeout 30000
+ :timeout 10000
  :repl-doc "000_REPLICATIONS"
 
  ;; logging

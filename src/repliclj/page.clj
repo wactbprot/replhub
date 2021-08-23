@@ -9,7 +9,10 @@
 ;;........................................................................
 (defn date [] (.format (new java.text.SimpleDateFormat "yyyy-MM-dd HH:mm") (java.util.Date.)))
 
-(defn url->db [s] (last (string/split u #"/")))
+(defn url->db [s] (last (string/split s #"/")))
+
+(defn url->host [s]
+   (last (string/split (last (butlast (string/split s #"/"))) #"@")))
 
 (defn nice-date [s] (string/replace s #"[TZ]" "&nbsp;&nbsp;&nbsp;"))
 
@@ -44,6 +47,7 @@
   [:tr
    [:td (url->db (:source m))]
    [:td (url->db (:target m))]
+   [:td (url->host (:target m))]
    [:td (:state m)]
    [:td (:changes_pending (:info m))] 
    [:td (:error_count m)]
@@ -55,6 +59,7 @@
    [:thead [:tr
             [:th "source db"]
             [:th "target db"]
+            [:th "target host"]
             [:th "status"]
             [:th {:uk-tooltip "pending changes"} "cp"]
             [:th {:uk-tooltip "error count"} "ec"]

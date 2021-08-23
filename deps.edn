@@ -2,7 +2,7 @@
         org.clojure/tools.deps.alpha {:mvn/version "0.12.1019"}}
  :aliases
  {:dev {:extra-paths ["src" "resources"]
-        :extra-deps {org.clojure/clojure {:mvn/version "1.10.3"}
+        :extra-deps {overtone/at-at {:mvn/version "1.2.0"}
                      cheshire/cheshire {:mvn/version "5.10.1"}
                      compojure/compojure {:mvn/version "1.6.2"}
                      http-kit/http-kit {:mvn/version "2.5.3"}

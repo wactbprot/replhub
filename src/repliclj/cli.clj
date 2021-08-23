@@ -6,6 +6,7 @@
             [repliclj.crypto :as crypto]
             [repliclj.log :as log]
             [clojure.pprint :as pp]
+            [clojure.data :as data]
             [com.brunobonacci.mulog :as µ])
   (:use [clojure.repl])
   (:gen-class))
@@ -30,6 +31,9 @@
   ([c] (conn c nil))
   ([c m] (decrypt-hash-a (if m (merge c m) c))))
 
+(defn new-servers [o n]
+  (let [d (data/diff o n)]
+    (filterv seq (second d))))
 ;;........................................................................
 ;; doc
 ;;........................................................................
@@ -73,24 +77,23 @@
   [c source target]
   (db/start-repli (conn c source) (conn c target)))
 
-(defn inner-replis [c]
-  (let [rdoc (get-repli-doc c)]
+(defn inner-replis [c rdoc]
     (mapv #(start-repli c (assoc % :db "vl_db") (assoc % :db "vl_db_work"))
-          rdoc)))
+          rdoc))
 
-(defn outer-replis [c]
-  (let [rdoc (get-repli-doc c)]
+(defn outer-replis [c rdoc]
     (mapv #(let [source (nth rdoc %)]
              (mapv (fn [target]
                      (when (not= source target)
                        (start-repli c (assoc source :db "vl_db") (assoc target :db "vl_db"))))
                    rdoc))
-          (range (count rdoc)))))
+          (range (count rdoc))))
 
-(defn replis-start [c]
-  "Starts the inner and outer replications of the entire system"
-  (inner-replis c)
-  (outer-replis c))
+(defn replis-start 
+  "Starts the inner and outer replications of the entire system."
+  [c rdoc]
+  (inner-replis c rdoc)
+  (outer-replis c rdoc))
 
 ;;........................................................................
 ;; database and usr
@@ -112,9 +115,7 @@
   (ensure-vl-db c)
   (ensure-work-db c))
 
-(defn prepair-dbs [c]
-  (let [rdoc (get-repli-doc c)]
-    (mapv #(prepair-db (conn c %)) rdoc)))
+(defn prepair-dbs [c rdoc] (mapv #(prepair-db (conn c %)) rdoc))
 
 ;;........................................................................
 ;; playground
