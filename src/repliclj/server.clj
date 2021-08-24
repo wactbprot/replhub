@@ -37,12 +37,6 @@
       (middleware/wrap-json-body {:keywords? true})
       (middleware/wrap-json-response)))
 
-(defn stop [c]
-  (when @server (@server :timeout 100)
-        (at/stop @at-every)
-        (log/stop c)
-        (reset! server nil)))
-
 (defn check [c]
   (when-let [cdoc (cli/get-repli-doc (cli/conn c))]
     (when-let [nsrv (cli/new-servers @rdoc cdoc)]
@@ -50,11 +44,17 @@
       (cli/prepair-dbs c nsrv)
       (cli/replis-start c nsrv)
       (reset! rdoc cdoc))))
+
+(defn stop [c]
+  (when @server (@server :timeout 100)
+        (at/stop @at-every)
+        (log/stop c)
+        (reset! server nil)))
       
 (defn start [{i :check-interval :as c}]
-  (reset! at-every (at/every i #(check c)  at-pool))
   (log/start c)
   (µ/log ::start :message "start repliclj server")
+  (reset! at-every (at/every i #(check c)  at-pool))
   (reset! server (run-server app (:api c))))
 
 

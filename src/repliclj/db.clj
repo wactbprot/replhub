@@ -13,6 +13,10 @@
 
 (defn db-url [{db :db :as conn}] (str (base-url conn) "/" db))
 
+(defn dbs-url [{db :db :as conn}] (str (base-url conn) "/_all_dbs"))
+
+(defn dbs-info-url [{db :db :as conn}] (str (base-url conn) "/_dbs_info"))
+
 (defn doc-url [{id :id rev :rev :as conn}]
   (str (db-url conn) "/" id (when rev (str "?rev=" rev))))
 
@@ -39,7 +43,7 @@
    :basic-auth [name pwd]})
 
 (defn result [{body :body header :headers status :status url :url}]
-  (let [body (try (che/decode body true)
+  (let [body (try (che/parse-string-strict body true )
                   (catch Exception e (µ/log ::result :error (.getMessage e))))]
     (if (< status 400) 
       (do (µ/log ::result :status  status :url url) body)
@@ -99,6 +103,15 @@
     (when (online? url conn)
       (when-not (exists? url opt)
         (result @(http/put url opt))))))
+
+(defn get-dbs-info [conn]
+  (let [url (dbs-url conn)
+        opt (opts conn url)]
+    (when (online? url conn)
+      (let [dbs (result @(http/get url opt))]
+        (when (seq dbs)
+          (let [url (dbs-info-url conn)]
+            (result @(http/post url (assoc opt :body (che/encode {:keys dbs}))))))))))
 
 (defn gen-usr [{usr :cred-usr-name pwd :cred-usr-pwd :as conn}]
   (let [url (usr-url conn) 

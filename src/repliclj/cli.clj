@@ -52,7 +52,10 @@
 
 (defn replis-docs [c] 
   (let [rdoc (get-repli-doc c)]
-    (mapv (fn [m] {(:server m) (db/repli-docs (conn c m))}) rdoc)))
+    (mapv (fn [m] {:server (:server m)
+                   :docs (db/repli-docs (conn c m))
+                   :alias (:alias m)
+                   :db-info (db/get-dbs-info (conn c m))}) rdoc)))
 
 ;;........................................................................
 ;; replication stop

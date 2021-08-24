@@ -11,7 +11,7 @@
  :db "vl_db"
  :port 5984
  :prot "http"
- :timeout 10000
+ :timeout 5000
  :repl-doc "000_REPLICATIONS"
 
  ;; logging

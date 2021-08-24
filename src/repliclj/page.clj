@@ -73,15 +73,22 @@
          (fn [[state number]]  (str state ": " number "  "))
          (frequencies (mapv :state v)))))
 
+(defn db-info [v]
+  (into [:ul.uk-breadcrumb]
+        (mapv (fn [db] [:li [:span (:key db) "&nbsp;"] [:span.uk-badge (:doc_count (:info db))]])
+              v)))
+
 (defn li [m]
-  (let [title (first (keys m))
-        data  (first (vals m))
+  (let [data  (:docs m)
         sum   (state-summary data)]
     [:li
      [:div.uk-accordion-title {:uk-grid ""}
       [:div.uk-text-muted.uk-text-left sum]
-      [:div.uk-width-expand.uk-grid-column-medium.uk-text-right title]]
-     [:div.uk-accordion-content (table data)]]))
+      [:div.uk-width-expand.uk-grid-column-medium.uk-text-right
+       (:alias m) [:span.uk-text-muted (:server m)]]]
+     [:div.uk-accordion-content
+      (db-info (:db-info m))
+      (table data)]]))
 
 (defn accord [conf data] (into [:ul {:uk-accordion ""}] (mapv li data)))
 
@@ -91,9 +98,9 @@
 (defn body [conf data content libs]
   (into [:body#body
          (nav conf data)
-         [:div.uk-container.uk-padding
+         [:div.uk-container.uk-padding.uk-margin
           [:article.uk-article
-           [:h3.uk-article-title.uk-text-uppercase.uk-heading-line.uk-text-center
+           [:h4.uk-article-title.uk-text-uppercase.uk-heading-line.uk-text-center
             [:a.uk-link-reset {:href ""} "replication state"]]
            [:p.uk-article-meta (date)]
            [:p.uk-text-lead
