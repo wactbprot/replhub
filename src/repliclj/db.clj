@@ -53,7 +53,7 @@
 ;; query fuctions
 ;;........................................................................
 (defn online? [url opt]
-  (if (not (contains? @(http/head url opt) :error))
+  (if (not (contains? @(http/head url (assoc opt :timeout 100)) :error))
     (do (µ/log ::online? :url url :online true) true)
     (do (µ/log ::online? :url url :online false) false)))
           

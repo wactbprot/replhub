@@ -127,7 +127,7 @@
   ;; use conn to resolve pwd
   (def c (conn conf/conf))
   
-  (def m  {:server "e75458"
+  (def m  {:server "e75467"
            :port "5984"
            :alias "Optische Druckmessung (devhub)"
            :hash-a "FjwyQzvCIVPqoowj85s+YA=="})

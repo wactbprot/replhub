@@ -83,12 +83,13 @@
         sum   (state-summary data)]
     [:li
      [:div.uk-accordion-title {:uk-grid ""}
-      [:div.uk-text-muted.uk-text-left sum]
+      [:div.uk-text-muted.uk-text-left (if (seq data) sum "offline")]
       [:div.uk-width-expand.uk-grid-column-medium.uk-text-right
        (:alias m) [:span.uk-text-muted (:server m)]]]
-     [:div.uk-accordion-content
-      (db-info (:db-info m))
-      (table data)]]))
+     (when (seq data)
+       [:div.uk-accordion-content
+        (db-info (:db-info m))
+        (table data)])]))
 
 (defn accord [conf data] (into [:ul {:uk-accordion ""}] (mapv li data)))
 

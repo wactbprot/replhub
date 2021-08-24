@@ -39,11 +39,12 @@
 
 (defn check [c]
   (when-let [cdoc (cli/get-repli-doc (cli/conn c))]
-    (when-let [nsrv (cli/new-servers @rdoc cdoc)]
-      (µ/log ::check :message "found new entries")
-      (cli/prepair-dbs c nsrv)
-      (cli/replis-start c nsrv)
-      (reset! rdoc cdoc))))
+    (let [nsrv (cli/new-servers @rdoc cdoc)]
+      (when (seq nsrv)
+        (µ/log ::check :message "found new entries")
+        (cli/prepair-dbs c cdoc)
+        (cli/replis-start c cdoc)
+        (reset! rdoc cdoc)))))
 
 (defn stop [c]
   (when @server (@server :timeout 100)
