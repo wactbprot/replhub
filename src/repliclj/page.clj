@@ -3,18 +3,8 @@
     :doc "Simple replication state overview page delivered by server.clj."}
   (:require [hiccup.form :as hf]
             [hiccup.page :as hp]
+            [repliclj.utils :as u]
             [clojure.string :as string]))
-;;........................................................................
-;; utils
-;;........................................................................
-(defn date [] (.format (new java.text.SimpleDateFormat "yyyy-MM-dd HH:mm") (java.util.Date.)))
-
-(defn url->db [s] (last (string/split s #"/")))
-
-(defn url->host [s]
-   (last (string/split (last (butlast (string/split s #"/"))) #"@")))
-
-(defn nice-date [s] (string/replace s #"[TZ]" "&nbsp;&nbsp;&nbsp;"))
 
 (defn not-found []
   (hp/html5
@@ -38,21 +28,21 @@
 ;;........................................................................
 ;; graph
 ;;........................................................................
-(defn graph [conf data] [:div.uk-container {:id "graph" :style "height:960px;"}]) 
+(defn graph [conf data] [:div.uk-container {:id "graph" :style "height:960px;"}])
 
 ;;........................................................................
 ;; table
 ;;........................................................................
 (defn table-row [m]
   [:tr
-   [:td (url->db (:source m))]
-   [:td (url->db (:target m))]
-   [:td (url->host (:target m))]
+   [:td (u/url->db (:source m))]
+   [:td (u/url->db (:target m))]
+   [:td (u/url->host (:target m))]
    [:td (:state m)]
-   [:td (:changes_pending (:info m))] 
+   [:td (:changes_pending (:info m))]
    [:td (:error_count m)]
-   [:td (nice-date (:start_time m))]
-   [:td (nice-date (:last_updated m))]])
+   [:td (u/nice-date (:start_time m))]
+   [:td (u/nice-date (:last_updated m))]])
 
 (defn table [v]
   [:table.uk-table.uk-table-hover.uk-table-striped
@@ -103,7 +93,7 @@
           [:article.uk-article
            [:h4.uk-article-title.uk-text-uppercase.uk-heading-line.uk-text-center
             [:a.uk-link-reset {:href ""} "replication state"]]
-           [:p.uk-article-meta (date)]
+           [:p.uk-article-meta (u/date)]
            [:p.uk-text-lead
             content]]]] libs))
 
@@ -131,7 +121,7 @@
          (condp = content
            :table [(hp/include-js "/js/uikit.js")
                    (hp/include-js "/js/uikit-icons.js")]
-           
+
            :graph [(hp/include-js "/js/vis-network.min.js")
                    (hp/include-js "/js/graph.js")
                    (hp/include-js "/js/jquery.js")

@@ -9,6 +9,7 @@
             [repliclj.page :as page]
             [repliclj.conf :as conf]
             [repliclj.log :as log]
+            [repliclj.utils :as u]
             [compojure.core :refer :all]
             [compojure.handler :as handler]
             [org.httpkit.server :refer [run-server]]
@@ -25,10 +26,10 @@
 
 
 (defroutes app-routes
-  
+
   (GET "/table" [] (page/index conf/conf (cli/replis-docs conf/conf) :table))
   (GET "/graph" [] (page/index conf/conf (cli/replis-docs conf/conf) :graph))
-  
+
   (route/resources "/")
   (route/not-found (page/not-found)))
 
@@ -38,12 +39,12 @@
       (middleware/wrap-json-response)))
 
 (defn check [c]
-  (when-let [cdoc (cli/get-repli-doc (cli/conn c))]
+  (let [cdoc (cli/get-repli-doc (cli/conn c))]
     (let [nsrv (cli/new-servers @rdoc cdoc)]
       (when (seq nsrv)
         (µ/log ::check :message "found new entries")
         (cli/prepair-dbs c cdoc)
-        (cli/replis-start c cdoc)
+        (cli/start-replis c cdoc)
         (reset! rdoc cdoc)))))
 
 (defn stop [c]
@@ -51,7 +52,7 @@
         (at/stop @at-every)
         (log/stop c)
         (reset! server nil)))
-      
+
 (defn start [{i :check-interval :as c}]
   (log/start c)
   (µ/log ::start :message "start repliclj server")
@@ -64,4 +65,5 @@
   (start conf/conf))
 
 (comment
+  (start conf/conf)
   (stop-and-reset-pool! at-pool))
