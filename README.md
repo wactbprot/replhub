@@ -22,6 +22,30 @@ Most operations need admin rights e.g. the generation of the `_users`,
 * `export CAL_USR=< users name>` (defaults to "cal")
 * `export CAL_PWD=< users password>`
 
+## generate uberjar (tools.deps)
+
+`tools.deps` version with [depstar](https://github.com/seancorfield/depstar):
+
+```shell
+clojure -X:uberjar :aot true :jar repliclj.jar :main-class repliclj.server :aliases '[:dev]'
+```
+
+```shell
+java -jar repliclj.jar
+```
+
+## systemd
+
+```shell
+cd /path/to/repliclj
+sudo mkdir /usr/local/share/
+sudo cp repliclj.jar /usr/local/share/repliclj
+sudo cp repliclj.service  /etc/systemd/system/
+sudo systemctl enable repliclj.service
+sudo systemctl start repliclj.service
+sudo systemctl status repliclj.service
+``` 
+
 ## notes
 
 ### model graph
