@@ -24,9 +24,8 @@
                 :href "https://gitlab1.ptb.de/bock04/repliclj"} "gitlab"]]
       [:li [:a {:target "_blank"
                 :href "http://a75438:5601/app/discover#/view/6fde0090-06ff-11ec-a0ed-9fa5b8b37aed"} "elasticsearch"]]
-     [:li [:a {:uk-icon "icon: file-text"
-               :target "_blank"
-                :href "https://docs.couchdb.org/en/main/replication/index.html"}]]]]])
+     [:li [:a { :target "_blank"
+                :href "https://docs.couchdb.org/en/main/replication/index.html"} "repli docu"]]]]])
 
 
 ;;........................................................................
