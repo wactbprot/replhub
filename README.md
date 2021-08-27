@@ -11,7 +11,7 @@ Initialises replications and [list replication status](http://a75438:8011/table)
 * [introduction to replication](https://docs.couchdb.org/en/stable/replication/intro.html#introduction-to-replication) 
 * `RepliClj` uses [persistent replication](https://docs.couchdb.org/en/stable/replication/intro.html#transient-and-persistent-replication)
 * [replication start, stop](https://docs.couchdb.org/en/stable/replication/intro.html#transient-and-persistent-replication)
-* [replication states descriptions](https://docs.couchdb.org/en/main/replication/replicator.html#states-descriptions]
+* [replication states descriptions](https://docs.couchdb.org/en/main/replication/replicator.html#states-descriptions)
 
 ## Environment vars
 
