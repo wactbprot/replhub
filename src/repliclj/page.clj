@@ -24,7 +24,12 @@
                 :target "_blank"
                 :href "https://github.com/wactbprot/repliclj"}]]
       [:li [:a {:target "_blank"
-                :href "http://a75438:5601/app/discover"} "elasticsearch"]]]]])
+                :href "http://a75438:5601/app/discover#/view/6fde0090-06ff-11ec-a0ed-9fa5b8b37aed"} "elasticsearch"]]
+     [:li [:a {:uk-icon "icon: file-text"
+               :target "_blank"
+                :href "https://docs.couchdb.org/en/main/replication/index.html"}]]]]])
+
+
 ;;........................................................................
 ;; graph
 ;;........................................................................
@@ -37,12 +42,15 @@
   [:tr
    [:td (u/url->db (:source m))]
    [:td (u/url->db (:target m))]
-   [:td (u/url->host (:target m))]
+   [:td (u/url->host-name (:target m))]
    [:td (:state m)]
    [:td (:changes_pending (:info m))]
    [:td (:error_count m)]
    [:td (u/nice-date (:start_time m))]
-   [:td (u/nice-date (:last_updated m))]])
+   [:td (u/nice-date (:last_updated m))]
+   [:td [:a {:target "_blank"
+             :uk-icon "link"
+             :href (u/repli-doc-link m)}]]])
 
 (defn table [v]
   [:table.uk-table.uk-table-hover.uk-table-striped
@@ -51,16 +59,17 @@
             [:th "target db"]
             [:th "target host"]
             [:th "status"]
-            [:th {:uk-tooltip "pending changes"} "cp"]
+            [:th {:uk-tooltip "pending changes"} "pc"]
             [:th {:uk-tooltip "error count"} "ec"]
             [:th "start time"]
-            [:th "last updated"]]]
+            [:th "last updated"]
+            [:th.uk-table-shrink "doc"]]]
    (into [:tbody] (map table-row v))])
 
 (defn state-summary [v]
   (into [:span.uk-text-muted.uk-text-center]
         (mapv
-         (fn [[state number]]  (str state ": " number "  "))
+         (fn [[state number]]  (str   state ":&nbsp;"number "&nbsp;&nbsp;&nbsp;"))
          (frequencies (mapv :state v)))))
 
 (defn db-info [v]
@@ -73,9 +82,9 @@
         sum   (state-summary data)]
     [:li
      [:div.uk-accordion-title {:uk-grid ""}
-      [:div.uk-text-muted.uk-text-left (if (seq data) sum "offline")]
+      [:div.uk-text-muted.uk-text-left (if (seq data) sum "no data")]
       [:div.uk-width-expand.uk-grid-column-medium.uk-text-right
-       (:alias m) [:span.uk-text-muted (:server m)]]]
+       (:alias m) [:span.uk-text-muted (u/host->host-name (:server m))]]]
      (when (seq data)
        [:div.uk-accordion-content
         (db-info (:db-info m))
@@ -91,7 +100,7 @@
          (nav conf data)
          [:div.uk-container.uk-padding.uk-margin
           [:article.uk-article
-           [:h4.uk-article-title.uk-text-uppercase.uk-heading-line.uk-text-center
+           [:h4.uk-article-title.uk-text-uppercase.uk-heading-line.uk-text-center.uk-text-muted
             [:a.uk-link-reset {:href ""} "replication state"]]
            [:p.uk-article-meta (u/date)]
            [:p.uk-text-lead

@@ -52,10 +52,12 @@
 ;;........................................................................
 ;; query fuctions
 ;;........................................................................
-(defn online? [url opt]
+(defn online? [conn]
+  (let [url (base-url conn)
+        opt (opts conn url)]
   (if (not (contains? @(http/head url (assoc opt :timeout 100)) :error))
     (do (µ/log ::online? :url url :online true) true)
-    (do (µ/log ::online? :url url :online false) false)))
+    (do (µ/log ::online? :url url :online false) false))))
 
 (defn exists? [url opt]
   (if (< (get @(http/head url opt) :status 400) 400)
@@ -65,20 +67,20 @@
 (defn repli-docs [conn]
   (let [url (act-url conn)
         opt (opts conn url)]
-    (when (online? url conn)
+    (when (online? conn)
       (:docs (result @(http/get url opt))))))
 
 (defn get-doc [conn]
   (let [url (doc-url conn)
         opt (opts conn url)]
-    (when (online? url conn)
+    (when (online? conn)
       (when (exists? url opt)
       (result @(http/get url opt))))))
 
 (defn del-doc [conn]
   (let [url (doc-url conn)
         opt (opts conn url)]
-    (when (online? url conn)
+    (when (online? conn)
       (when (exists? url opt)
         (let [res (result @(http/get url opt))]
           (result @(http/delete (doc-url (assoc conn :rev (:_rev res))) opt)))))))
@@ -86,14 +88,14 @@
 (defn post-doc [conn doc]
   (let [url (doc-url conn)
         opt (opts conn url)]
-    (when (online? url conn)
+    (when (online? conn)
       (when-not (exists? url opt)
         (result @(http/put url (assoc opt :body (che/encode doc))))))))
 
 (defn get-repli-docs [conn]
   (let [url (repli-docs-url conn)
         opt (opts conn url)]
-    (when (online? url conn)
+    (when (online? conn)
       (when (exists? url opt)
         (when-let [rows (:rows (result @(http/get url opt)))]
           (filterv #(not (design-doc? %)) rows))))))
@@ -101,14 +103,14 @@
 (defn gen-db [conn]
   (let [url (db-url conn)
         opt (opts conn url)]
-    (when (online? url conn)
+    (when (online? conn)
       (when-not (exists? url opt)
         (result @(http/put url opt))))))
 
 (defn get-dbs-info [conn]
   (let [url (dbs-url conn)
         opt (opts conn url)]
-    (when (online? url conn)
+    (when (online? conn)
       (let [dbs (result @(http/get url opt))]
         (when (seq dbs)
           (let [url (dbs-info-url conn)]
@@ -118,7 +120,7 @@
   (let [url (usr-url conn)
         opt (opts conn url)
         doc {:name usr :password pwd :roles [] :type "user"}]
-    (when (online? url conn)
+    (when (online? conn)
       (when-not (exists? url opt)
         (result @(http/put url (assoc opt :body (che/encode doc))))))))
 
@@ -126,7 +128,7 @@
   (let [url (sec-url conn)
         opt (opts conn url)
         doc {:members {:names [usr] :roles []}}]
-    (when (online? url conn)
+    (when (online? conn)
       (result @(http/put url (assoc opt :body (che/encode doc)))))))
 
 (defn start-repli

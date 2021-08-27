@@ -33,14 +33,6 @@
   ([c] (conn c nil))
   ([c m] (decrypt-hash-a (if m (merge c m) c))))
 
-(defn new-servers [o n]
-  (let [d (data/diff (set o) (set n))]
-    (filterv seq (second d))))
-
-(defn rem-servers [o n]
-  (let [d (data/diff (set o) (set n))]
-    (filterv seq (first d))))
-
 ;;........................................................................
 ;; doc
 ;;........................................................................

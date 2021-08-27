@@ -27,5 +27,5 @@
             :exec-fn hf.depstar/uberjar
             :exec-args {:aot true
                         :jar "repliclj.jar"
-                        :main-class "wactbprot.repliclj"
+                        :main-class "repliclj.server"
                         :sync-pom true}}}}

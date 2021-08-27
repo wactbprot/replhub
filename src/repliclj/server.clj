@@ -22,7 +22,7 @@
 
 (defonce server (atom nil))
 
-(defonce rdoc (atom (cli/get-repli-doc (cli/conn conf/conf))))
+(defonce rdoc (atom nil))
 
 
 (defroutes app-routes
@@ -40,12 +40,11 @@
 
 (defn check [c]
   (let [cdoc (cli/get-repli-doc (cli/conn c))]
-    (let [nsrv (cli/new-servers @rdoc cdoc)]
-      (when (seq nsrv)
+      (when-not (= (count cdoc) (count @rdoc)) 
         (µ/log ::check :message "found new entries")
         (cli/prepair-dbs c cdoc)
         (cli/start-replis c cdoc)
-        (reset! rdoc cdoc)))))
+        (reset! rdoc cdoc))))
 
 (defn stop [c]
   (when @server (@server :timeout 100)
@@ -55,10 +54,10 @@
 
 (defn start [{i :check-interval :as c}]
   (log/start c)
-  (µ/log ::start :message "start repliclj server")
-  (reset! at-every (at/every i #(check c)  at-pool))
+  (µ/log ::start :message "start repliclj server, check")
+  (check c)
+  (reset! at-every (at/every i #(check c) at-pool))
   (reset! server (run-server app (:api c))))
-
 
 (defn -main [& args]
   (µ/log ::-main :message "call -main")
