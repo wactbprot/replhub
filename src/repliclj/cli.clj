@@ -6,8 +6,6 @@
             [repliclj.crypto :as crypto]
             [repliclj.log :as log]
             [repliclj.utils :as u]
-            [clojure.pprint :as pp]
-            [clojure.data :as data]
             [clojure.string :as string]
             [com.brunobonacci.mulog :as µ])
   (:use [clojure.repl])
@@ -27,29 +25,25 @@
   (assoc c :cred-admin-pwd (when (and hash secret) (crypto/decrypt hash secret))))
 
 ;;........................................................................
-;; preparation
+;; connection
 ;;........................................................................
 (defn conn
   ([c] (conn c nil))
   ([c m] (decrypt-hash-a (if m (merge c m) c))))
 
 ;;........................................................................
-;; doc
+;; rdoc
 ;;........................................................................
-(defn get-repli-doc [{id :repl-doc :as c}]
+(defn get-rdoc [{id :repl-doc :as c}]
   (:Replications (db/get-doc (conn (assoc c :id id)))))
 
 ;;........................................................................
 ;; replication
 ;;........................................................................
-(defn repli-table [c]
-  (let [v [:doc_id :state  :error_count :start_time :last_updated ]]
-    (pp/print-table (mapv #(select-keys % v) (db/repli-docs c)))))
-
 (defn replis-docs [c]
-  (let [rdoc (get-repli-doc c)]
+  (let [rdoc (get-rdoc c)]
     (mapv (fn [m] {:server (:server m)
-                   :docs (db/repli-docs (conn c m))
+                   :docs (db/active-docs (conn c m))
                    :alias (:alias m)
                    :db-info (db/get-dbs-info (conn c m))}) rdoc)))
 
@@ -67,7 +61,7 @@
 (defn replis-stop
   "Stops all replications on the entire system."
   [c]
-  (mapv repli-stop (get-repli-doc c)))
+  (mapv repli-stop (get-rdoc c)))
 
 ;;........................................................................
 ;; replication start
@@ -94,17 +88,6 @@
   [c rdoc]
   (inner-replis c rdoc)
   (outer-replis c rdoc))
-
-(comment
-  (defn clear-repli [c rdoc]
-  (let  [crep  (db/repli-docs c)
-         chost (set (mapv #(u/host->host-name (u/url->host (:target %))) crep))
-         crep-id (mapv :doc_id crep)
-         rhost (set (mapv #(u/host->host-name (:server %)) rdoc))
-         routs (first (data/diff chost rhost))
-         out-id (flatten (mapv (fn [rout] (filterv #(string/includes? % rout) crep-id)) routs))]
-    (mapv #(db/del-doc (assoc c :id % :db "_replicator")) out-id))))
-
 
 ;;........................................................................
 ;; database and usr
