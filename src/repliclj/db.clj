@@ -52,6 +52,12 @@
 ;;........................................................................
 ;; query fuctions
 ;;........................................................................
+(defn get-rev [conn]
+  (let [url (base-url conn)
+        opt (opts conn url)]
+;; go on here
+    @(http/head url opt)))
+
 (defn online? [conn]
   (let [url (base-url conn)
         opt (opts conn url)]
@@ -64,7 +70,7 @@
     (do (µ/log ::exists? :url url :exists true) true)
     (do (µ/log ::exists? :url url :exists false) false)))
 
-(defn repli-docs [conn]
+(defn active-docs [conn]
   (let [url (act-url conn)
         opt (opts conn url)]
     (when (online? conn)

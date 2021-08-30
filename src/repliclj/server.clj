@@ -39,7 +39,7 @@
       (middleware/wrap-json-response)))
 
 (defn check [c]
-  (let [cdoc (cli/get-repli-doc (cli/conn c))]
+  (let [cdoc (cli/get-rdoc (cli/conn c))]
       (when-not (= (count cdoc) (count @rdoc)) 
         (µ/log ::check :message "found new entries")
         (cli/prepair-dbs c cdoc)
