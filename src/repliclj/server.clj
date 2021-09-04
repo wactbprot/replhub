@@ -24,7 +24,6 @@
 
 (defonce rdoc (atom nil))
 
-
 (defroutes app-routes
 
   (GET "/table" [] (page/index conf/conf (cli/replis-docs conf/conf) :table))

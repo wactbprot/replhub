@@ -52,11 +52,8 @@
 ;;........................................................................
 ;; query fuctions
 ;;........................................................................
-(defn get-rev [conn]
-  (let [url (base-url conn)
-        opt (opts conn url)]
-;; go on here
-    @(http/head url opt)))
+(defn get-rev [url opt]
+  (string/replace (get-in  @(http/head url opt) [:headers :etag]) #"\"" ""))
 
 (defn online? [conn]
   (let [url (base-url conn)
@@ -81,6 +78,7 @@
         opt (opts conn url)]
     (when (online? conn)
       (when (exists? url opt)
+        (prn (get-rev url opt))
       (result @(http/get url opt))))))
 
 (defn del-doc [conn]
