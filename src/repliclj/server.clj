@@ -1,7 +1,7 @@
 (ns repliclj.server
   ^{:author "Thomas Bock <wactbprot@gmail.com>"
     :doc "Webserver delivers overview page and keeps the system
-    alive. Triggers replication check."}
+    alive. Triggers replication check. Clears off outdated replications."}
   (:require [overtone.at-at :as at]
             [compojure.route :as route]
             [com.brunobonacci.mulog :as µ]
@@ -26,8 +26,7 @@
 
 (defroutes app-routes
 
-  (GET "/table" [] (page/index conf/conf (cli/active-info conf/conf) :table))
-  (GET "/graph" [] (page/index conf/conf (cli/active-info conf/conf) :graph))
+  (GET "/" [] (page/index conf/conf (cli/active-info conf/conf)))
 
   (route/resources "/")
   (route/not-found (page/not-found)))
@@ -40,7 +39,7 @@
 (defn check [c]
   (let [cdoc (cli/get-rdoc (cli/conn c))]
       (when-not (= (count cdoc) (count @rdoc)) 
-        (µ/log ::check :message "found new entries")
+        (µ/log ::check :message "found differences")
         (cli/prepair-dbs c cdoc)
         (cli/start-replis c cdoc)
         (cli/clear-replis c cdoc)

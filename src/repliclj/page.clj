@@ -29,11 +29,6 @@
 
 
 ;;........................................................................
-;; graph
-;;........................................................................
-(defn graph [conf data] [:div.uk-container {:id "graph" :style "height:960px;"}])
-
-;;........................................................................
 ;; table
 ;;........................................................................
 (defn table-row [m]
@@ -102,7 +97,8 @@
             [:a.uk-link-reset {:href ""} "replication state"]]
            [:p.uk-article-meta (u/date)]
            [:p.uk-text-lead
-            content]]]] libs))
+            content]]]]
+        libs))
 
 ;;........................................................................
 ;; head
@@ -116,21 +112,10 @@
 ;;........................................................................
 ;; index
 ;;........................................................................
-(defn index [conf data content]
+(defn index [conf data]
   (hp/html5
    (head conf data)
    (body conf data
-         ;; content
-         (condp = content
-           :table (accord conf data)
-           :graph (graph conf data))
-         ;; libs
-         (condp = content
-           :table [(hp/include-js "/js/uikit.js")
-                   (hp/include-js "/js/uikit-icons.js")]
-
-           :graph [(hp/include-js "/js/vis-network.min.js")
-                   (hp/include-js "/js/graph.js")
-                   (hp/include-js "/js/jquery.js")
-                   (hp/include-js "/js/uikit.js")
-                   (hp/include-js "/js/uikit-icons.js")]))))
+         (accord conf data)
+         [(hp/include-js "/js/uikit.js")
+         (hp/include-js "/js/uikit-icons.js")])))

@@ -10,31 +10,38 @@
 ;;........................................................................
 ;; utils
 ;;........................................................................
-(defn base-url [{prot :prot srv :server port :port}] (str prot "://"  srv ":" port))
+(defn base-url [{prot :prot srv :server port :port}]
+  (str prot "://"  srv ":" port))
 
-(defn db-url [{db :db :as conn}] (str (base-url conn) "/" db))
+(defn db-url [{db :db :as conn}]
+  (str (base-url conn) "/" db))
 
-(defn dbs-url [{db :db :as conn}] (str (base-url conn) "/_all_dbs"))
+(defn dbs-url [{db :db :as conn}]
+  (str (base-url conn) "/_all_dbs"))
 
-(defn dbs-info-url [{db :db :as conn}] (str (base-url conn) "/_dbs_info"))
+(defn dbs-info-url [{db :db :as conn}]
+  (str (base-url conn) "/_dbs_info"))
 
 (defn doc-url [{id :id rev :rev :as conn}]
   (str (db-url conn) "/" id (when rev (str "?rev=" rev))))
 
-(defn repli-docs-url [conn] (str (base-url conn) "/_replicator/_all_docs"))
+(defn repli-docs-url [conn]
+  (str (base-url conn) "/_replicator/_all_docs"))
 
-(defn usr-url [{usr :cred-usr-name :as conn}] (str (base-url conn) "/_users/org.couchdb.user:" usr))
+(defn usr-url [{usr :cred-usr-name :as conn}]
+  (str (base-url conn) "/_users/org.couchdb.user:" usr))
 
-(defn sec-url [conn] (str (db-url conn) "/_security"))
+(defn sec-url [conn]
+  (str (db-url conn) "/_security"))
 
-(defn act-url [conn] (str (base-url conn) "/_scheduler/docs/_replicator/"))
+(defn act-url [conn]
+  (str (base-url conn) "/_scheduler/docs/_replicator/"))
 
 (defn cred-db-url [{prot :prot srv :server port :port name :cred-admin-name pwd :cred-admin-pwd db :db}]
   (str prot "://" name ":" pwd "@" srv ":" port "/" db))
 
 (defn design-doc? [m]
-  (let [id (or (:_id m) (:id m))]
-    (string/starts-with? id "_design")))
+  (string/starts-with? (or (:_id m) (:id m)) "_design"))
 
 (defn opts [{name :cred-admin-name pwd :cred-admin-pwd t :timeout} url]
   {:headers {"Content-Type" "application/json"
@@ -59,13 +66,17 @@
   (let [url (base-url conn)
         opt (opts conn url)]
   (if (not (contains? @(http/head url (assoc opt :timeout 100)) :error))
-    (do (µ/log ::online? :url url :online true) true)
-    (do (µ/log ::online? :url url :online false) false))))
+    (do (µ/log ::online? :url url :online true)
+        true)
+    (do (µ/log ::online? :url url :online false)
+        false))))
 
 (defn exists? [url opt]
   (if (< (get @(http/head url opt) :status 400) 400)
-    (do (µ/log ::exists? :url url :exists true) true)
-    (do (µ/log ::exists? :url url :exists false) false)))
+    (do (µ/log ::exists? :url url :exists true)
+        true)
+    (do (µ/log ::exists? :url url :exists false)
+        false)))
 
 (defn active-docs [conn]
   (let [url (act-url conn)
@@ -78,16 +89,14 @@
         opt (opts conn url)]
     (when (online? conn)
       (when (exists? url opt)
-        (prn (get-rev url opt))
-      (result @(http/get url opt))))))
+        (result @(http/get url opt))))))
 
 (defn del-doc [conn]
   (let [url (doc-url conn)
         opt (opts conn url)]
     (when (online? conn)
       (when (exists? url opt)
-        (let [res (result @(http/get url opt))]
-          (result @(http/delete (doc-url (assoc conn :rev (:_rev res))) opt)))))))
+        (result @(http/delete (doc-url (assoc conn :rev (get-rev url opt))) opt))))))
 
 (defn post-doc [conn doc]
   (let [url (doc-url conn)
