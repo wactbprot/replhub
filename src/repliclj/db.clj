@@ -142,9 +142,4 @@
             {:_id (u/gen-repli-id source target)
              :source (cred-db-url source)
              :target (cred-db-url target)
-             ;; new in version 3.2
-             ;; :target  {:url  (db-url target)
-             ;;          :auth {:basic {:username (:cred-admin-name target)
-             ;;                         :password (:cred-admin-pwd target)}}}
-
              :continuous cont?})))

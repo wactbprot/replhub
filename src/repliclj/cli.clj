@@ -6,6 +6,7 @@
             [repliclj.crypto :as crypto]
             [repliclj.log :as log]
             [repliclj.utils :as u]
+            [clojure.data :as data]
             [clojure.string :as string]
             [com.brunobonacci.mulog :as µ])
   (:use [clojure.repl])
@@ -39,9 +40,9 @@
   (:Replications (db/get-doc (conn (assoc c :id id)))))
 
 ;;........................................................................
-;; replication
+;; replication info
 ;;........................................................................
-(defn replis-docs [c]
+(defn active-info [c]
   (let [rdoc (get-rdoc c)]
     (mapv (fn [m] {:server (:server m)
                    :docs (db/active-docs (conn c m))
@@ -53,16 +54,35 @@
 ;;........................................................................
 (defn repli-stop
   "Stops all replications at `c`."
-  [c]
-  (let [v (db/get-repli-docs c)
+  [c m]
+  (let [v (db/get-repli-docs (conn c m))
         c (assoc c :db "_replicator")]
     (mapv (fn [{id :id {rev :rev} :value}]
-            (db/del-doc (assoc c :id id :rev rev))) v)))
+            (db/del-doc (assoc (conn c m):id id :rev rev))) v)))
 
 (defn replis-stop
   "Stops all replications on the entire system."
   [c]
-  (mapv repli-stop (get-rdoc c)))
+  (mapv #(repli-stop c %) (get-rdoc c)))
+
+;;........................................................................
+;; replication clear
+;;........................................................................
+(defn filter-by-target [host-name idoc] (filterv #(string/ends-with? (:id %) host-name) idoc))
+
+(defn clear-repli [c m]
+  (let [rdoc          (get-rdoc c)
+        idoc          (db/get-repli-docs (conn c m))
+        should-hosts  (set (mapv (comp u/host->host-name :server) rdoc))
+        is-hosts      (set (filterv seq (mapv (comp u/id->target-host-name :id) idoc)))
+        clear-hosts   (second (data/diff should-hosts is-hosts))
+        docs-to-clear (flatten (mapv  #(filter-by-target % idoc) clear-hosts))]
+    (mapv #(db/del-doc (assoc (conn c m) :id (:id %) :db "_replicator")) docs-to-clear)))
+
+(defn clear-replis
+  "Clears all replications which are not in rdoc."
+  [c rdoc]
+  (mapv #(clear-repli c %) rdoc))
 
 ;;........................................................................
 ;; replication start
@@ -72,15 +92,15 @@
   [c source target]
   (db/start-repli (conn c source) (conn c target)))
 
-(defn inner-replis [c rdoc]
-    (mapv #(start-repli c (assoc % :db "vl_db") (assoc % :db "vl_db_work"))
+(defn inner-replis [{work-db :work-db outer-db :outer-db :as c} rdoc]
+    (mapv #(start-repli c (assoc % :db outer-db) (assoc % :db work-db))
           rdoc))
 
-(defn outer-replis [c rdoc]
+(defn outer-replis [{work-db :work-db outer-db :outer-db :as c} rdoc]
     (mapv #(let [source (nth rdoc %)]
              (mapv (fn [target]
                      (when (not= source target)
-                       (start-repli c (assoc source :db "vl_db") (assoc target :db "vl_db"))))
+                       (start-repli c (assoc source :db outer-db) (assoc target :db outer-db))))
                    rdoc))
           (range (count rdoc))))
 
@@ -99,9 +119,9 @@
 
 (defn ensure-repli-db [c] (db/gen-db (assoc c :db "_replicator")))
 
-(defn ensure-vl-db [c] (ensure-db+usr (assoc c :db "vl_db")))
+(defn ensure-vl-db [{outer-db :outer-db :as c}] (ensure-db+usr (assoc c :db outer-db)))
 
-(defn ensure-work-db [c] (ensure-db+usr (assoc c :db "vl_db_work")))
+(defn ensure-work-db [{work-db :work-db :as c}] (ensure-db+usr (assoc c :db work-db)))
 
 (defn prepair-db [c]
   (ensure-users-db c)

@@ -26,8 +26,8 @@
 
 (defroutes app-routes
 
-  (GET "/table" [] (page/index conf/conf (cli/replis-docs conf/conf) :table))
-  (GET "/graph" [] (page/index conf/conf (cli/replis-docs conf/conf) :graph))
+  (GET "/table" [] (page/index conf/conf (cli/active-info conf/conf) :table))
+  (GET "/graph" [] (page/index conf/conf (cli/active-info conf/conf) :graph))
 
   (route/resources "/")
   (route/not-found (page/not-found)))
@@ -43,6 +43,7 @@
         (µ/log ::check :message "found new entries")
         (cli/prepair-dbs c cdoc)
         (cli/start-replis c cdoc)
+        (cli/clear-replis c cdoc)
         (reset! rdoc cdoc))))
 
 (defn stop [c]

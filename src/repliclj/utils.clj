@@ -50,3 +50,7 @@
   (str (url->prot (:source m)) "://"
        (url->host (:source m)) ":"
        (url->port (:source m)) "/_utils/#database/" (:database m)"/" (:doc_id m)))
+
+(defn id->target-host-name [s]
+  (let [v (string/split s #"@")]
+    (when (and (string/includes? s "--") (= 3 (count v))) (last v))))

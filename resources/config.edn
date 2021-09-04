@@ -13,6 +13,11 @@
  :port 5984
  :prot "http"
  :timeout 5000
+
+ ;; standard setup 
+ :work-db "vl_db_work"
+ :outer-db "vl_db"
+
  :repl-doc "000_REPLICATIONS"
 
  ;; logging
