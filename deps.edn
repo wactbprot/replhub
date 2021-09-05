@@ -1,7 +1,14 @@
 {:deps {org.clojure/clojure {:mvn/version "1.10.3"}
         org.clojure/tools.deps.alpha {:mvn/version "0.12.1019"}}
+
+ :paths ["src"]
+
  :aliases
- {:dev {:extra-paths ["src" "resources"]
+ {:build {:extra-paths ["src" "resources"]
+          :deps {io.github.clojure/tools.build {:git/tag "v0.2.1" :git/sha "dd64636"}}
+  :ns-default build}
+  
+  :dev {:extra-paths ["src" "resources"]
         :extra-deps {overtone/at-at {:mvn/version "1.2.0"}
                      cheshire/cheshire {:mvn/version "5.10.1"}
                      compojure/compojure {:mvn/version "1.6.2"}

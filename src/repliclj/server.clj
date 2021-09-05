@@ -25,9 +25,7 @@
 (defonce rdoc (atom nil))
 
 (defroutes app-routes
-
   (GET "/" [] (page/index conf/conf (cli/active-info conf/conf)))
-
   (route/resources "/")
   (route/not-found (page/not-found)))
 

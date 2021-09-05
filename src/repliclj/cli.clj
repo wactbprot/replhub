@@ -23,8 +23,7 @@
 ;; crypt
 ;;........................................................................
 (defn decrypt-hash-a [{hash :hash-a secret :cred-admin-secret :as c}]
-  #_(assoc c :cred-admin-pwd (when (and hash secret) (crypto/decrypt hash secret))
-           )c)
+  (assoc c :cred-admin-pwd (when (and hash secret) (crypto/decrypt hash secret))))
 
 ;;........................................................................
 ;; connection
