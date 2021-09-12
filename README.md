@@ -2,16 +2,10 @@
 
 <img src="model.png" alt="model" id="logo">
 
-Generates databases and users at CouchDB (v3) instances following the
-document [000_REPLICATIONS](http://a75438.berlin.ptb.de:5984/_utils/#database/vl_db/000_REPLICATIONS). 
-Initialises replications and [list replication status](http://a75438:8011/table).
-
-## Replication documentation
-
-* [introduction to replication](https://docs.couchdb.org/en/stable/replication/intro.html#introduction-to-replication) 
-* `RepliClj` uses [persistent replication](https://docs.couchdb.org/en/stable/replication/intro.html#transient-and-persistent-replication)
-* [replication start, stop](https://docs.couchdb.org/en/stable/replication/intro.html#transient-and-persistent-replication)
-* [replication states descriptions](https://docs.couchdb.org/en/main/replication/replicator.html#states-descriptions)
+Generates databases and a user at CouchDB (v3) instances. Initialises
+but also stops replications following the document
+[000_REPLICATIONS](http://a75438.berlin.ptb.de:5984/_utils/#database/vl_db/000_REPLICATIONS).
+Provides a website with the [replication status](http://a75438:8011/).
 
 ## Environment vars
 
@@ -24,16 +18,20 @@ Most operations need admin rights e.g. the generation of the `_users`,
 * `export CAL_USR=< users name>` (defaults to "cal")
 * `export CAL_PWD=< users password>`
 
-## generate uberjar (tools.deps)
+## generate uberjar (tools.build)
 
-`tools.deps` version with [depstar](https://github.com/seancorfield/depstar):
+In order to generate an stand alone uberjar **RepliClj** uses [tools.build](https://clojure.org/guides/tools_build). Run:
 
 ```shell
-clojure -X:uberjar :aot true :jar repliclj.jar :main-class repliclj.server :aliases '[:dev]'
+clj -T:build clean
+clj -T:build prep
+clj -T:build uber
 ```
 
+Start the server by invoking:
+
 ```shell
-java -jar repliclj.jar
+java -jar target/repliclj-x.y.z-standalone.jar
 ```
 
 ## systemd
@@ -55,3 +53,11 @@ sudo systemctl status repliclj.service
 ```shell
 neato model.dot -T png > model.png
 ```
+
+
+## replication documentation
+
+* [introduction to replication](https://docs.couchdb.org/en/stable/replication/intro.html#introduction-to-replication) 
+* `RepliClj` uses [persistent replication](https://docs.couchdb.org/en/stable/replication/intro.html#transient-and-persistent-replication)
+* [replication start, stop](https://docs.couchdb.org/en/stable/replication/intro.html#transient-and-persistent-replication)
+* [replication states descriptions](https://docs.couchdb.org/en/main/replication/replicator.html#states-descriptions)

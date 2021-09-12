@@ -4,10 +4,7 @@
 (def lib 'com.github.wactbprot/repliclj)
 (def version (format "0.2.%s" (b/git-count-revs nil)))
 (def class-dir "target/classes")
-(def basis (b/create-basis {:project "deps.edn"}))
-
-(def jar-file (format "target/%s-%s.jar" (name lib) version))
-
+(def basis (b/create-basis {:project "deps.edn" :aliases [:dev]}))
 (def uber-file (format "target/%s-%s-standalone.jar" (name lib) version))
 
 (defn clean [_]
@@ -22,21 +19,11 @@
   (b/copy-dir {:src-dirs ["src" "resources"]
                :target-dir class-dir}))
 
-(defn jar [_]
-  (b/write-pom {:class-dir class-dir
-                :lib lib
-                :version version
-                :basis basis
-                :src-dirs ["src"]})
-  (b/copy-dir {:src-dirs ["src" "resources"]
-               :target-dir class-dir})
-  (b/jar {:class-dir class-dir
-          :jar-file jar-file}))
-
 (defn uber [_]
   (b/compile-clj {:basis basis
                   :src-dirs ["src"]
                   :class-dir class-dir})
   (b/uber {:class-dir class-dir
+           :main 'repliclj.server
            :uber-file uber-file
            :basis basis}))
