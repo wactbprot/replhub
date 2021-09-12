@@ -8,6 +8,10 @@
            [java.security SecureRandom]
            [org.apache.commons.codec.binary Base64]))
 
+;; move to buddy instead:
+;; https://matthewdowney.github.io/encrypting-keys-in-clojure-applications.html
+;; provide a js page that produces pwd encryption
+
 (defn str->bytes [s] (.getBytes s "UTF-8"))
 
 (defn bytes->base64 [b] (Base64/encodeBase64String b))
