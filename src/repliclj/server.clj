@@ -22,8 +22,6 @@
 
 (defonce server (atom nil))
 
-(defonce rdoc (atom nil))
-
 (defroutes app-routes
   (GET "/" [] (page/index conf/conf (cli/active-info conf/conf)))
   (route/resources "/")
@@ -36,12 +34,10 @@
 
 (defn check [c]
   (let [cdoc (cli/get-rdoc (cli/conn c))]
-      (when-not (= (count cdoc) (count @rdoc)) 
-        (µ/log ::check :message "found differences")
-        (cli/prepair-dbs c cdoc)
-        (cli/start-replis c cdoc)
-        (cli/clear-replis c cdoc)
-        (reset! rdoc cdoc))))
+    (µ/log ::check :message "start check")
+    (cli/prepair-dbs c cdoc)
+    (cli/start-replis c cdoc)
+    (cli/clear-replis c cdoc)))
 
 (defn stop [c]
   (when @server (@server :timeout 100)
