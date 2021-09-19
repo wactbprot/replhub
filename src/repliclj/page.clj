@@ -21,7 +21,7 @@
    [:div.uk-navbar-center
     [:ul.uk-navbar-nav
       [:li [:a {:target "_blank"
-                :href "https://gitlab1.ptb.de/bock04/repliclj"} "gitlab"]]
+                :href "https://gitlab1.ptb.de/vaclab/repliclj"} "gitlab"]]
       [:li [:a {:target "_blank"
                 :href "http://a75438:5601/app/discover#/view/6fde0090-06ff-11ec-a0ed-9fa5b8b37aed"} "elasticsearch"]]
      [:li [:a { :target "_blank"
