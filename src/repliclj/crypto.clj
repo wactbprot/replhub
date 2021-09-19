@@ -1,7 +1,9 @@
 (ns  repliclj.crypto
   ^{:author "Thomas Bock <wactbprot@gmail.com>"
     :doc "Simple encode/decode function (AES/128) following
-          https://stackoverflow.com/questions/10221257/is-there-an-aes-library-for-clojure."}
+          https://stackoverflow.com/questions/10221257/is-there-an-aes-library-for-clojure.
+           also:
+          https://github.com/xsc/pandect"}
   (:require [repliclj.conf :as conf])
   (:import [javax.crypto Cipher KeyGenerator SecretKey]
            [javax.crypto.spec SecretKeySpec]
